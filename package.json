@@ -3,7 +3,7 @@
   "version": "17.0.0",
   "private": true,
   "description": "Проект «Большое путешествие» от HTML Academy",
-  "browserlist": [
+  "browserslist": [
     "last 2 versions",
     "not dead",
     "not ie <= 11",

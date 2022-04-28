@@ -189,6 +189,7 @@ main {
   margin-bottom: 35px; }
 
 .trip-main__trip-controls {
+  margin-top: 36px;
   width: 600px; }
 
 .trip-main__event-add-btn {
