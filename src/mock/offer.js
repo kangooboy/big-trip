@@ -1,12 +1,6 @@
-import { getRandomInt} from './util.js';
+import { getRandomInt} from '../util.js';
 
-const generateOffer = () => {
-  const offers = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-  const randomIndex = getRandomInt(0, offers.length - 1);
-  return offers[randomIndex];
-};
-
-const offersByType = [
+const offers = [
   {
     type: 'taxi',
     offers: [
@@ -107,3 +101,7 @@ const offersByType = [
   },
 ];
 
+export const generateOffer = () => {
+  const randomIndex = getRandomInt(0, offers.length - 1);
+  return offers[randomIndex];
+};

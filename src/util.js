@@ -1,4 +1,4 @@
-import dayjs from 'day.js';
+import dayjs from 'dayjs';
 
 const getRandomInt = function (first, second) {
   const min = (first < second) ? Math.ceil(first) : Math.floor(second);
