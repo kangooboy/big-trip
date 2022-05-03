@@ -16,7 +16,7 @@ const destinations = [
     name: 'Amsterdam',
     pictures: [
       {
-        src: 'http://picsum.photos/248/152?r=0.0762563345163317',
+        src: 'https://www.outsourcing-pharma.com/var/wrbm_gb_food_pharma/storage/images/_aliases/wrbm_large/1/9/4/7/3257491-3-eng-GB/Japan-to-be-hot-destination-for-trials-in-2015-say-experts-despite-drop-in-MRCTs-last-year.jpg',
         description: 'Amsterdam parliament building'
       }
     ]
@@ -26,7 +26,7 @@ const destinations = [
     name: 'Geneva',
     pictures: [
       {
-        src: 'http://picsum.photos/300/200?r=0.0762546005843317',
+        src: 'https://www.outsourcing-pharma.com/var/wrbm_gb_food_pharma/storage/images/_aliases/wrbm_large/7/2/3/8/1358327-1-eng-GB/Catalent-to-open-Japanese-development-lab.jpg',
         description: 'Geneva parliament building'
       }
     ]

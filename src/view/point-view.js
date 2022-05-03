@@ -19,7 +19,7 @@ const createPointTemplate = (point) => {
 
   const createHeaderOfferListTemplate = () => (offers.length > 0)?
     `<h4 class="visually-hidden">Offers:</h4>
-    <ul class="event__selected-offers">${createOffer(offers)}</ul>`: '';
+     <ul class="event__selected-offers">${createOffer(offers)}</ul>`: '';
 
   return (
     `<li class="trip-events__item">

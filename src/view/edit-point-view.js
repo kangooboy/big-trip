@@ -1,38 +1,49 @@
 import { createElement } from '../render.js';
 import { destinations } from '../mock/destination.js';
 
+const createDestinationImage = (destination) => {
+  const { pictures } = destination;
+  const createImages = (images) => images.reduce((prev, curr) => `${prev}
+      <img class="event__photo" src="${curr.src}" alt="${curr.description}"></img>`, '');
+
+  return (pictures !== [])?(
+    `<div class="event__photos-container">
+      <div class="event__photos-tape">
+        ${createImages(pictures)}
+      </div>
+    </div>`
+  ):'';
+};
+
 const createDestination = (name) => {
-  const destination = destinations.filter((element) => element.name === name);
-  return (destination[0].description !== '')?
+  const destination = destinations.find((element) => element.name === name);
+  return (destination)?
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${destination[0].description}</p>
+      <p class="event__destination-description">${destination.description}</p>
+      ${createDestinationImage(destination)}
     </section>`:'';
 };
 
-const createOfferButton = (offers) => {
-  let offerItems = '';
-  offers.map((item) => {
-    const { title, price } = item;
-    const nameId = title.split(' ').slice(-1)[0];
-    offerItems +=
-      `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${nameId}-1" type="checkbox" name="event-offer-${nameId}">
-        <label class="event__offer-label" for="event-offer-${nameId}-1">
-          <span class="event__offer-title">${title}</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">${price}</span>
-        </label>
-      </div>`;
-  });
-  return offerItems;
-};
+const createOfferButtonsTemplate = (offers) => offers.reduce((prev, curr) => {
+  const { title, price } = curr;
+  const nameId = title.split(' ').slice(-1)[0];
+  return `${prev}
+    <div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${nameId}-1" type="checkbox" name="event-offer-${nameId}" checked>
+      <label class="event__offer-label" for="event-offer-${nameId}-1">
+        <span class="event__offer-title">${title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${price}</span>
+      </label>
+    </div>`;
+}, '');
 
 const createOfferContainer = (offers) => (offers.length !== 0)?(
   `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${createOfferButton(offers)}
+      ${createOfferButtonsTemplate(offers)}
     </div>
   </section>`):'';
 

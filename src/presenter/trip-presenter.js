@@ -12,13 +12,12 @@ export default class TripPresenter {
     this.tripPoints = [...pointsModel.getPoints()];
 
     render(new SortPointView(), tripContainer);
+    render(new NewPointView(), this.tripListComponent.getElement());
     render(this.tripListComponent, tripContainer);
     render(new EditPointView(this.tripPoints[0]), this.tripListComponent.getElement());
 
-    for(let i = 0; i < this.tripPoints.length; i++) {
-      render(new PointView(this.tripPoints[i]), this.tripListComponent.getElement());
+    for(const point of this.tripPoints) {
+      render(new PointView(point), this.tripListComponent.getElement());
     }
-
-    render(new NewPointView(), this.tripListComponent.getElement());
   };
 }
