@@ -4,7 +4,7 @@ import EditPointView from '../view/edit-point-view.js';
 import TripListView from '../view/trip-list-view.js';
 import SortPointView from '../view/sort-point-view.js';
 import TripInfoView from '../view/trip-info-view.js';
-import { render, RenderPosition } from '../render.js';
+import { render, RenderPosition, replace } from '../framework/render.js';
 
 const tripHeaderContainer = document.querySelector('.trip-main');
 
@@ -25,6 +25,7 @@ export default class TripPresenter {
       render(new TripInfoView(), tripHeaderContainer, RenderPosition.AFTERBEGIN);
       render(new SortPointView(), this.#tripContainer);
       render(this.#tripListComponent, this.#tripContainer);
+
       for(const point of this.#tripPoints) {
         this.#renderPoint(point);
       }
@@ -35,10 +36,10 @@ export default class TripPresenter {
     const pointComponent = new PointView(point);
     const editPointView = new EditPointView(point);
     const replacePointToEdit = () => {
-      this.#tripListComponent.element.replaceChild(editPointView.element, pointComponent.element);
+      replace(editPointView, pointComponent);
     };
     const replaceEditToPoint = () => {
-      this.#tripListComponent.element.replaceChild(pointComponent.element, editPointView.element);
+      replace(pointComponent, editPointView);
     };
     const onEscKeyDown = (evt) => {
       if(evt.key === 'Escape' || evt.key === 'Esc') {
@@ -48,15 +49,14 @@ export default class TripPresenter {
       }
     };
 
-    pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    pointComponent.setEditClickHandler(() => {
       replacePointToEdit();
       document.addEventListener('keydown', onEscKeyDown);
     });
 
-    editPointView.element.querySelector('.event__rollup-btn').addEventListener('click', replaceEditToPoint);
+    editPointView.setEditFormClickHandler(replaceEditToPoint);
 
-    editPointView.element.addEventListener('submit', (evt) => {
-      evt.preventDefault();
+    editPointView.setEditFormSubmitHandler(() => {
       replaceEditToPoint();
       document.removeEventListener('keydown', onEscKeyDown);
     });
