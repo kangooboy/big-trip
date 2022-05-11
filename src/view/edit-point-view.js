@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { destinations } from '../mock/destination.js';
 
 const createDestinationImage = (destination) => {
@@ -155,11 +155,11 @@ const createEditPointTemplate = (point) => {
   );
 };
 
-export default class EditPointView {
-  #element = null;
+export default class EditPointView extends AbstractView {
   #point = null;
 
   constructor(point) {
+    super();
     this.#point = point;
   }
 
@@ -167,14 +167,23 @@ export default class EditPointView {
     return createEditPointTemplate(this.#point);
   }
 
-  get element() {
-    if(!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
+  setEditFormClickHandler = (callback) => {
+    this._callback.editFormClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editFormClick);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  #editFormClick = (evt) => {
+    evt.preventDefault();
+    this._callback.editFormClick();
+  };
+
+  setEditFormSubmitHandler = (callback) => {
+    this._callback.editFormSubmit = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#editFormSubmit);
+  };
+
+  #editFormSubmit = (evt) => {
+    evt.preventDefault();
+    this._callback.editFormSubmit();
+  };
 }

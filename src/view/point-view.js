@@ -1,18 +1,15 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
-const createOffer = (offers) => {
-  let offerItems = '';
-  offers.map((item) => {
-    const { title, price } = item;
-    offerItems +=
-      `<li class="event__offer">
+const createOffer = (offers) => offers.reduce((prev, curr) => {
+  const { title, price } = curr;
+
+  return `${prev}
+    <li class="event__offer">
       <span class="event__offer-title">${title}</span>
       &plus;&euro;&nbsp;
       <span class="event__offer-price">${price}</span>
     </li>`;
-  });
-  return offerItems;
-};
+}, '');
 
 const createPointTemplate = (point) => {
   const { basePrice, destination, offers, type, dateFrom } = point;
@@ -55,11 +52,11 @@ const createPointTemplate = (point) => {
   );
 };
 
-export default class PointView {
-  #element = null;
+export default class PointView extends AbstractView {
   #point = null;
 
   constructor(point) {
+    super();
     this.#point = point;
   }
 
@@ -67,15 +64,14 @@ export default class PointView {
     return createPointTemplate(this.#point);
   }
 
-  get element() {
-    if(!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
+  setEditClickHandler = (callback) => {
+    this._callback.editClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.editClick();
+  };
 }
 
