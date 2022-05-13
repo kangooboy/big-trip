@@ -6,23 +6,29 @@ import SortPointView from '../view/sort-point-view.js';
 import TripInfoView from '../view/trip-info-view.js';
 import { render, RenderPosition, replace } from '../framework/render.js';
 
-const tripHeaderContainer = document.querySelector('.trip-main');
-
 export default class TripPresenter {
   #tripContainer = null;
   #pointsModel = null;
+  #tripHeaderContainer = null;
   #tripListComponent = new TripListView();
   #tripPoints = [];
 
-  init = (tripContainer, pointsModel) => {
+  constructor(tripContainer, tripHeaderContainer, pointsModel) {
     this.#tripContainer = tripContainer;
+    this.#tripHeaderContainer = tripHeaderContainer;
     this.#pointsModel = pointsModel;
-    this.#tripPoints = [...this.#pointsModel.points];
+  }
 
+  init = () => {
+    this.#tripPoints = [...this.#pointsModel.points];
+    this.#renderTrip();
+  };
+
+  #renderTrip = () => {
     if(this.#tripPoints.length === 0) {
       render(new NoPointView(), this.#tripContainer);
     } else {
-      render(new TripInfoView(), tripHeaderContainer, RenderPosition.AFTERBEGIN);
+      render(new TripInfoView(), this.#tripHeaderContainer, RenderPosition.AFTERBEGIN);
       render(new SortPointView(), this.#tripContainer);
       render(this.#tripListComponent, this.#tripContainer);
 
