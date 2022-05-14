@@ -9,8 +9,9 @@ const tripContainer = document.querySelector('.trip-events');
 const tripHeaderContainer = document.querySelector('.trip-main');
 
 const pointsModel = new PointsModel();
+const pointsCount = pointsModel.points.length;
 const tripPresenter = new TripPresenter(tripContainer, tripHeaderContainer, pointsModel);
 
-render(new FilterPointView(FILTERS), filterContainer);
+render(new FilterPointView(FILTERS, pointsCount), filterContainer);
 
 tripPresenter.init();
