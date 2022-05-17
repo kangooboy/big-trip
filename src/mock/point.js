@@ -3,6 +3,7 @@ import { generateOffer } from './offer.js';
 import { getRandomInt } from '../util.js';
 import { humanizeDueDate } from '../util.js';
 import dayjs from 'dayjs';
+import { nanoid } from 'nanoid';
 
 const generateDate = () => {
   const isDate = Boolean(getRandomInt(0,1));
@@ -22,7 +23,7 @@ export const generatePoint = () => {
     dateFrom: humanizeDueDate(generateDate()),
     dateTo: humanizeDueDate(dayjs()),
     destination: generateDestination().name,
-    id: '0',
+    id: nanoid(),
     isFavorite: false,
     offers,
     type
