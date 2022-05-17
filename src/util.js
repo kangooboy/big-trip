@@ -10,7 +10,7 @@ const humanizeDueDate = (dueDate) => dayjs(dueDate).format('D MMMM');
 
 const updateItem = (items, update) => {
   const index = items.findIndex((item) => item.id === update.id);
-  console.log(update);
+
   if(index === -1) {
     return items;
   }
