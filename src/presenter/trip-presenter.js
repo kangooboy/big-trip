@@ -82,7 +82,7 @@ export default class TripPresenter {
     this.#sortPoints(sortType);
     this.#clearPointList();
     this.#renderTrip();
-  }
+  };
 
   #renderSort = () => {
     render(this.#sortComponent, this.#tripContainer);
