@@ -1,3 +1,9 @@
 const FILTERS = ['everthing', 'future', 'past'];
 
-export { FILTERS };
+const SortType = {
+  DEFAULT: 'day',
+  TIME:'time',
+  PRICE: 'price',
+};
+
+export { FILTERS, SortType };

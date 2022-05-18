@@ -1,9 +1,9 @@
 import { generateDestination } from './destination.js';
 import { generateOffer } from './offer.js';
 import { getRandomInt } from '../util.js';
-import { humanizeDueDate } from '../util.js';
 import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
+import { randomHour, randomMinutes  } from '../util.js';
 
 const generateDate = () => {
   const isDate = Boolean(getRandomInt(0,1));
@@ -16,12 +16,17 @@ const generateDate = () => {
 };
 
 export const generatePoint = () => {
+  const [hourFrom, hourTo] = randomHour();
+  const [minutesFrom, minutesTo] = randomMinutes();
+  const randomDate = generateDate();
+  const dateFrom = dayjs(randomDate).format(`YYYY-MM-DDT${hourFrom}:${minutesFrom}`);
+  const dateTo = dayjs(randomDate).format(`YYYY-MM-DDT${hourTo}:${minutesTo}`);
 
   const { offers, type } = generateOffer();
   return {
     basePrice: getRandomInt(100, 1000),
-    dateFrom: humanizeDueDate(generateDate()),
-    dateTo: humanizeDueDate(dayjs()),
+    dateFrom,
+    dateTo,
     destination: generateDestination().name,
     id: nanoid(),
     isFavorite: false,
