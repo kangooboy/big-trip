@@ -57,7 +57,7 @@ const calculateTimeDifference = (dateFrom, dateTo) => {
 const sortByDay = (a, b) => {
   a = dayjs(a.dateFrom).format('DD');
   b = dayjs(b.dateFrom).format('DD');
-  return b - a;
+  return a - b;
 };
 
 const sortByTime = (a, b) => {
