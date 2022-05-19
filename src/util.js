@@ -6,9 +6,9 @@ const getRandomInt = function (first, second) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-const randomHour = () => {
-  const int1 = getRandomInt(0, 24);
-  const int2 = getRandomInt(0, 24);
+const randomRangeHours = () => {
+  const int1 = getRandomInt(0, 23);
+  const int2 = getRandomInt(0, 23);
   let hourFrom = Math.min(int1, int2);
   hourFrom = (hourFrom < 10) ? `0${hourFrom}` : hourFrom;
   let hourTo = Math.max(int1, int2);
@@ -16,7 +16,7 @@ const randomHour = () => {
   return [`${hourFrom}`, `${hourTo}`];
 };
 
-const randomMinutes = () => {
+const randomRangeMinutes = () => {
   const int1 = getRandomInt(1, 59);
   const int2 = getRandomInt(1, 59);
   let minutesFrom = Math.min(int1, int2);
@@ -49,9 +49,8 @@ const calculateTimeDifference = (dateFrom, dateTo) => {
   }
   if(minutes === '00') {
     return `${hours}H`;
-  }else {
-    return `${hours}H ${minutes}M`;
   }
+  return `${hours}H ${minutes}M`;
 };
 
 const sortByDay = (a, b) => {
@@ -68,4 +67,4 @@ const sortByTime = (a, b) => {
 
 const sortByPrice = (a, b) => b.basePrice - a.basePrice;
 
-export { getRandomInt, updateItem, randomHour, randomMinutes, calculateTimeDifference, sortByDay, sortByTime, sortByPrice};
+export { getRandomInt, updateItem, randomRangeHours, randomRangeMinutes, calculateTimeDifference, sortByDay, sortByTime, sortByPrice};

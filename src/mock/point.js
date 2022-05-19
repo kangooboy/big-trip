@@ -3,7 +3,7 @@ import { generateOffer } from './offer.js';
 import { getRandomInt } from '../util.js';
 import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
-import { randomHour, randomMinutes  } from '../util.js';
+import { randomRangeHours, randomRangeMinutes  } from '../util.js';
 
 const generateDate = () => {
   const isDate = Boolean(getRandomInt(0,1));
@@ -16,8 +16,8 @@ const generateDate = () => {
 };
 
 export const generatePoint = () => {
-  const [hourFrom, hourTo] = randomHour();
-  const [minutesFrom, minutesTo] = randomMinutes();
+  const [hourFrom, hourTo] = randomRangeHours();
+  const [minutesFrom, minutesTo] = randomRangeMinutes();
   const randomDate = generateDate();
   const dateFrom = dayjs(randomDate).format(`YYYY-MM-DDT${hourFrom}:${minutesFrom}`);
   const dateTo = dayjs(randomDate).format(`YYYY-MM-DDT${hourTo}:${minutesTo}`);

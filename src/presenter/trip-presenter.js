@@ -6,6 +6,7 @@ import TripInfoView from '../view/trip-info-view.js';
 import PointPresenter from '../presenter/point-presenter.js';
 import { render, RenderPosition } from '../framework/render.js';
 import { updateItem, sortByDay, sortByTime, sortByPrice} from '../util.js';
+import { DAY, PRICE, TIME } from '../const.js';
 
 export default class TripPresenter {
   #tripContainer = null;
@@ -61,24 +62,24 @@ export default class TripPresenter {
     render(this.#infoComponent, this.#tripHeaderContainer, RenderPosition.AFTERBEGIN);
   };
 
-  #sortPoints = (sortType) => {
-    switch (sortType) {
-      case 'day':
+  #sortPoints = (sortName) => {
+    switch (sortName) {
+      case DAY:
         this.#tripPoints.sort(sortByDay);
         break;
-      case 'time':
+      case TIME:
         this.#tripPoints.sort(sortByTime);
         break;
-      case 'price':
+      case PRICE:
         this.#tripPoints.sort(sortByPrice);
         break;
     }
   };
 
   #handleSortTypeChange = (sortType) => {
-    sortType = sortType.split('-')[1];
+    const sortName = sortType.split('-')[1];
 
-    this.#sortPoints(sortType);
+    this.#sortPoints(sortName);
     this.#clearPointList();
     this.#renderTrip();
   };
