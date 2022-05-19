@@ -5,13 +5,16 @@ import SortPointView from '../view/sort-point-view.js';
 import TripInfoView from '../view/trip-info-view.js';
 import PointPresenter from '../presenter/point-presenter.js';
 import { render, RenderPosition } from '../framework/render.js';
-import { updateItem } from '../util.js';
+import { updateItem, sortByDay, sortByTime, sortByPrice} from '../util.js';
+import { DAY, PRICE, TIME } from '../const.js';
 
 export default class TripPresenter {
   #tripContainer = null;
   #pointsModel = null;
   #tripHeaderContainer = null;
   #tripListComponent = new TripListView();
+  #sortComponent = new SortPointView();
+  #infoComponent = new TripInfoView();
   #tripPoints = [];
   #pointPresenter = new Map();
 
@@ -22,7 +25,7 @@ export default class TripPresenter {
   }
 
   init = () => {
-    this.#tripPoints = [...this.#pointsModel.points];
+    this.#tripPoints = [...this.#pointsModel.points].sort(sortByDay);
     this.#renderTrip();
   };
 
@@ -30,8 +33,8 @@ export default class TripPresenter {
     if(this.#tripPoints.length === 0) {
       render(new NoPointView(), this.#tripContainer);
     } else {
-      render(new TripInfoView(), this.#tripHeaderContainer, RenderPosition.AFTERBEGIN);
-      render(new SortPointView(), this.#tripContainer);
+      this.#renderTripInfo();
+      this.#renderSort();
       render(this.#tripListComponent, this.#tripContainer);
 
       for(const point of this.#tripPoints) {
@@ -53,6 +56,37 @@ export default class TripPresenter {
     const pointPresenter = new PointPresenter(this.#tripListComponent.element, this.#handlePointChange, this.#handleModeChange);
     pointPresenter.init(point);
     this.#pointPresenter.set(point.id, pointPresenter);
+  };
+
+  #renderTripInfo = () => {
+    render(this.#infoComponent, this.#tripHeaderContainer, RenderPosition.AFTERBEGIN);
+  };
+
+  #sortPoints = (sortName) => {
+    switch (sortName) {
+      case DAY:
+        this.#tripPoints.sort(sortByDay);
+        break;
+      case TIME:
+        this.#tripPoints.sort(sortByTime);
+        break;
+      case PRICE:
+        this.#tripPoints.sort(sortByPrice);
+        break;
+    }
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    const sortName = sortType.split('-')[1];
+
+    this.#sortPoints(sortName);
+    this.#clearPointList();
+    this.#renderTrip();
+  };
+
+  #renderSort = () => {
+    render(this.#sortComponent, this.#tripContainer);
+    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
   #clearPointList = () => {
