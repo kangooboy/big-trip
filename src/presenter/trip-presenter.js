@@ -5,8 +5,7 @@ import SortPointView from '../view/sort-point-view.js';
 import TripInfoView from '../view/trip-info-view.js';
 import PointPresenter from '../presenter/point-presenter.js';
 import { render, RenderPosition } from '../framework/render.js';
-import { updateItem, sortTimeUp,  sortPriceUp} from '../util.js';
-import { SortType } from '../const';
+import { updateItem, sortByDay, sortByTime, sortByPrice} from '../util.js';
 
 export default class TripPresenter {
   #tripContainer = null;
@@ -14,10 +13,9 @@ export default class TripPresenter {
   #tripHeaderContainer = null;
   #tripListComponent = new TripListView();
   #sortComponent = new SortPointView();
+  #infoComponent = new TripInfoView();
   #tripPoints = [];
-  #sourceTripPoints = [];
   #pointPresenter = new Map();
-  #currentSortType = SortType.DEFAULT;
 
   constructor(tripContainer, tripHeaderContainer, pointsModel) {
     this.#tripContainer = tripContainer;
@@ -26,8 +24,7 @@ export default class TripPresenter {
   }
 
   init = () => {
-    this.#tripPoints = [...this.#pointsModel.points];
-    this.#sourceTripPoints = [...this.#pointsModel.points];
+    this.#tripPoints = [...this.#pointsModel.points].sort(sortByDay);
     this.#renderTrip();
   };
 
@@ -35,7 +32,7 @@ export default class TripPresenter {
     if(this.#tripPoints.length === 0) {
       render(new NoPointView(), this.#tripContainer);
     } else {
-      render(new TripInfoView(), this.#tripHeaderContainer, RenderPosition.AFTERBEGIN);
+      this.#renderTripInfo();
       this.#renderSort();
       render(this.#tripListComponent, this.#tripContainer);
 
@@ -60,24 +57,26 @@ export default class TripPresenter {
     this.#pointPresenter.set(point.id, pointPresenter);
   };
 
+  #renderTripInfo = () => {
+    render(this.#infoComponent, this.#tripHeaderContainer, RenderPosition.AFTERBEGIN);
+  };
+
   #sortPoints = (sortType) => {
     switch (sortType) {
-      case SortType.TIME:
-        this.#tripPoints.sort(sortTimeUp);
+      case 'day':
+        this.#tripPoints.sort(sortByDay);
         break;
-      case SortType.PRICE:
-        this.#tripPoints.sort(sortPriceUp);
+      case 'time':
+        this.#tripPoints.sort(sortByTime);
         break;
-      default:
-        this.#tripPoints = [...this.#sourceTripPoints];
+      case 'price':
+        this.#tripPoints.sort(sortByPrice);
+        break;
     }
-    this.#currentSortType = sortType;
   };
 
   #handleSortTypeChange = (sortType) => {
-    if (this.#currentSortType === sortType) {
-      return;
-    }
+    sortType = sortType.split('-')[1];
 
     this.#sortPoints(sortType);
     this.#clearPointList();

@@ -54,12 +54,18 @@ const calculateTimeDifference = (dateFrom, dateTo) => {
   }
 };
 
-const sortTimeUp = () => {
-
+const sortByDay = (a, b) => {
+  a = dayjs(a.dateFrom).format('DD');
+  b = dayjs(b.dateFrom).format('DD');
+  return b - a;
 };
 
-const sortPriceUp = () => {
-
+const sortByTime = (a, b) => {
+  a = dayjs(a.dateTo).diff(a.dateFrom, 'hours');
+  b = dayjs(b.dateTo).diff(b.dateFrom, 'hours');
+  return  b - a;
 };
 
-export { getRandomInt, updateItem, randomHour, randomMinutes, calculateTimeDifference, sortTimeUp,  sortPriceUp };
+const sortByPrice = (a, b) => b.basePrice - a.basePrice;
+
+export { getRandomInt, updateItem, randomHour, randomMinutes, calculateTimeDifference, sortByDay, sortByTime, sortByPrice};
