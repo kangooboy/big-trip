@@ -132,6 +132,12 @@ export default class EditPointView extends AbstractStatefulView {
     return createEditPointTemplate(this._state);
   }
 
+  reset = (point) => {
+    this.updateElement(
+      EditPointView.parsePointToState(point)
+    );
+  };
+
   setEditFormClickHandler = (callback) => {
     this._callback.editFormClick = callback;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editFormClick);
