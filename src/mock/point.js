@@ -21,8 +21,8 @@ export const generatePoint = () => {
   const randomDate = generateDate();
   const dateFrom = dayjs(randomDate).format(`YYYY-MM-DDT${hourFrom}:${minutesFrom}`);
   const dateTo = dayjs(randomDate).format(`YYYY-MM-DDT${hourTo}:${minutesTo}`);
-
   const { offers, type } = generateOffer();
+
   return {
     basePrice: getRandomInt(100, 1000),
     dateFrom,
