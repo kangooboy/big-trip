@@ -31,11 +31,11 @@ const createDestinationList = (names) => names.reduce((prev, curr) => `${prev}
 <option value="${curr.name}"></option>`, '');
 
 const createOfferButtonsTemplate = (offers) => offers.reduce((prev, curr) => {
-  const { title, price } = curr;
+  const { title, price, isChecked } = curr;
   const nameId = title.split(' ').slice(-1)[0];
   return `${prev}
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${nameId}-1" type="checkbox" name="event-offer-${nameId}" checked>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${nameId}-1" type="checkbox" data-id=${curr.id} name="event-offer-${nameId}" ${(isChecked) ? 'checked' : ''}>
       <label class="event__offer-label" for="event-offer-${nameId}-1">
         <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
@@ -44,13 +44,13 @@ const createOfferButtonsTemplate = (offers) => offers.reduce((prev, curr) => {
     </div>`;
 }, '');
 
-const createOfferContainer = (offers) => (offers.length !== 0)?(
+const createOfferContainer = (offers) => (offers !== []) ? (
   `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${createOfferButtonsTemplate(offers)}
     </div>
-  </section>`):'';
+  </section>`) : '';
 
 const createTypeOfPoint = (offers) => offers.reduce((prev, curr) => `${prev}
   <div class="event__type-item">
@@ -134,7 +134,7 @@ export default class EditPointView extends AbstractStatefulView {
 
   reset = (point) => {
     this.updateElement(
-      EditPointView.parsePointToState(point)
+      EditPointView.parsePointToState(point),
     );
   };
 
@@ -169,26 +169,48 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
-  #changeDestinationChange = (evt) => {
+  #changeDestination = (evt) => {
     if(evt.target.tagName !== 'INPUT') {
       return;
     }
-    const targetDestination = destinations.find((element) => element.name === evt.target.value);
+    const targetDestination = destinations.find((element) => element.name = evt.target.value);
     this.updateElement({
       destination: targetDestination.name
     });
   };
 
-  static parsePointToState = (point) => ({...point});
+  #checkOffer = (evt) => {
+    if(evt.target.tagName !== 'INPUT') {
+      return;
+    }
+    const offerId = evt.target.dataset.id;
+    this._state.offers.forEach((item) => (item.id === offerId) ? item.isChecked = true : item);
+    this.updateElement({
+      offers: this._state.offers
+    });
+  };
+
+  static parsePointToState = (point) => {
+    if(point.offers !== []) {
+      point.offers.forEach((item) => item.isChecked = false);
+    }
+    return {...point};
+  };
 
   static parseStateToPoint = (state) => {
     const point = {...state};
+    if(point.offers !== []) {
+      point.offers.forEach((item) => delete item.isChecked);
+    }
     return point;
   };
 
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypePointChange);
-    this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestinationChange);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestination);
+    if(this.element.querySelector('.event__section--offers') !== null) {
+      this.element.querySelector('.event__available-offers').addEventListener('click', this.#checkOffer);
+    }
   };
 
   _restoreHandlers = () => {
