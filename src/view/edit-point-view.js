@@ -173,7 +173,7 @@ export default class EditPointView extends AbstractStatefulView {
     if(evt.target.tagName !== 'INPUT') {
       return;
     }
-    const targetDestination = destinations.find((element) => element.name = evt.target.value);
+    const targetDestination = destinations.find((element) => element.name === evt.target.value);
     this.updateElement({
       destination: targetDestination.name
     });
@@ -184,21 +184,21 @@ export default class EditPointView extends AbstractStatefulView {
       return;
     }
     const offerId = evt.target.dataset.id;
-    this._state.offers.forEach((item) => (item.id === offerId) ? item.isChecked = true : item);
-    this.updateElement({
-      offers: this._state.offers
+    const offers = this._state.offers.map((item) => (item.id === +offerId) ? Object.assign(item, {isChecked: !item.isChecked}) : item);
+    this._setState({
+      offers: offers
     });
   };
 
   static parsePointToState = (point) => {
     if(point.offers !== []) {
-      point.offers.forEach((item) => item.isChecked = false);
+      point.offers.forEach((item) => Object.assign(item, {isChecked: false}));
     }
     return {...point};
   };
 
   static parseStateToPoint = (state) => {
-    const point = {...state};
+    const point = Object.assign({}, state);
     if(point.offers !== []) {
       point.offers.forEach((item) => delete item.isChecked);
     }
