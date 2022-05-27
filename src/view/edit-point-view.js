@@ -30,25 +30,29 @@ const createDestination = (name) => {
 const createDestinationList = (names) => names.reduce((prev, curr) => `${prev}
 <option value="${curr.name}"></option>`, '');
 
-const createOfferButtonsTemplate = (offers) => offers.reduce((prev, curr) => {
-  const { title, price, isChecked } = curr;
-  const nameId = title.split(' ').slice(-1)[0];
-  return `${prev}
-    <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${nameId}-1" type="checkbox" data-id=${curr.id} name="event-offer-${nameId}" ${(isChecked) ? 'checked' : ''}>
-      <label class="event__offer-label" for="event-offer-${nameId}-1">
-        <span class="event__offer-title">${title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${price}</span>
-      </label>
-    </div>`;
-}, '');
+const createOfferButtonsTemplate = (type, offers) => {
+  const offerIndex = allOffers.findIndex((item) => item.type === type);
+  const targetOffers = allOffers[offerIndex].offers;
+  return targetOffers.reduce((prev, curr) => {
+    const { title, price, id } = curr;
+    return `${prev}
+      <div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-${id}" 
+          type="checkbox" data-id=${curr.id} name="event-offer-${type}" ${(offers.some((item) => item.id === id)) ? 'checked' : ''}>
+        <label class="event__offer-label" for="event-offer-${type}-${id}">
+          <span class="event__offer-title">${title}</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${price}</span>
+        </label>
+      </div>`;
+  }, '');
+};
 
-const createOfferContainer = (offers) => (offers !== []) ? (
+const createOfferContainer = (type, offers) => (offers !== []) ? (
   `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${createOfferButtonsTemplate(offers)}
+      ${(createOfferButtonsTemplate(type, offers))}
     </div>
   </section>`) : '';
 
@@ -59,7 +63,7 @@ const createTypeOfPoint = (offers) => offers.reduce((prev, curr) => `${prev}
   </div>`, '');
 
 const createEditPointTemplate = (data) => {
-  const { basePrice, destination, offers, type, dateFrom, dateTo } = data;
+  const { basePrice, destination, type, offers, dateFrom, dateTo } = data;
   return (
     `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -112,7 +116,7 @@ const createEditPointTemplate = (data) => {
           </button>
         </header>
         <section class="event__details">
-          ${createOfferContainer(offers)}
+          ${createOfferContainer(type, offers)}
           ${createDestination(destination)}
         </section>
       </form>
@@ -179,38 +183,37 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
-  #checkOffer = (evt) => {
-    if(evt.target.tagName !== 'INPUT') {
-      return;
-    }
-    const offerId = evt.target.dataset.id;
-    const offers = this._state.offers.map((item) => (item.id === +offerId) ? Object.assign(item, {isChecked: !item.isChecked}) : item);
-    this._setState({
-      offers: offers
-    });
-  };
+  // #checkOffer = (evt) => {
+  //   if(evt.target.tagName !== 'INPUT') {
+  //     return;
+  //   }
+  //   const offerId = evt.target.dataset.id;
+  //   const offers = this._state.offers.map((item) => (item.id === Number(offerId)) ? Object.assign(item, {isChecked: !item.isChecked}) : item);
+  //   this._setState({
+  //     offers: [...offers]
+  //   });
+  // };
 
   static parsePointToState = (point) => {
-    if(point.offers !== []) {
-      point.offers.forEach((item) => Object.assign(item, {isChecked: false}));
-    }
-    return {...point};
+    const copyPoint = JSON.parse(JSON.stringify(point));
+    return copyPoint;
   };
 
   static parseStateToPoint = (state) => {
-    const point = Object.assign({}, state);
-    if(point.offers !== []) {
-      point.offers.forEach((item) => delete item.isChecked);
-    }
+    const point = JSON.parse(JSON.stringify(state));
+    // if(point.offers !== []) {
+    //   point.offers.forEach((item) => (item.isChecked) ? delete item.isChecked : item);
+    //   console.log(point);
+    // }
     return point;
   };
 
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypePointChange);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestination);
-    if(this.element.querySelector('.event__section--offers') !== null) {
-      this.element.querySelector('.event__available-offers').addEventListener('click', this.#checkOffer);
-    }
+    // if(this.element.querySelector('.event__section--offers') !== null) {
+    //   this.element.querySelector('.event__available-offers').addEventListener('click', this.#checkOffer);
+    // }
   };
 
   _restoreHandlers = () => {
