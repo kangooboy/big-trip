@@ -38,7 +38,7 @@ const createOfferButtonsTemplate = (type, offers) => {
     return `${prev}
       <div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-${id}" 
-          type="checkbox" data-id=${curr.id} name="event-offer-${type}" ${(offers.some((item) => item.id === id)) ? 'checked' : ''}>
+          type="checkbox" data-id=${curr.id} name="event-offer-${type}" ${(offers.some((item) => item === id)) ? 'checked' : ''}>
         <label class="event__offer-label" for="event-offer-${type}-${id}">
           <span class="event__offer-title">${title}</span>
           &plus;&euro;&nbsp;
@@ -183,16 +183,22 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
-  // #checkOffer = (evt) => {
-  //   if(evt.target.tagName !== 'INPUT') {
-  //     return;
-  //   }
-  //   const offerId = evt.target.dataset.id;
-  //   const offers = this._state.offers.map((item) => (item.id === Number(offerId)) ? Object.assign(item, {isChecked: !item.isChecked}) : item);
-  //   this._setState({
-  //     offers: [...offers]
-  //   });
-  // };
+  #checkOffer = (evt) => {
+    if(evt.target.tagName !== 'INPUT') {
+      return;
+    }
+    const offerId = evt.target.dataset.id;
+    const offers = this._state.offers.slice();
+    if(offers.some((item) => item === Number(offerId))) {
+      const offerIndex = offers.findIndex((item) => item === Number(offerId));
+      offers.splice(offerIndex, 1);
+    } else {
+      offers.push(Number(offerId));
+    }
+    this._setState({
+      offers: [...offers]
+    });
+  };
 
   static parsePointToState = (point) => {
     const copyPoint = JSON.parse(JSON.stringify(point));
@@ -201,19 +207,15 @@ export default class EditPointView extends AbstractStatefulView {
 
   static parseStateToPoint = (state) => {
     const point = JSON.parse(JSON.stringify(state));
-    // if(point.offers !== []) {
-    //   point.offers.forEach((item) => (item.isChecked) ? delete item.isChecked : item);
-    //   console.log(point);
-    // }
     return point;
   };
 
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypePointChange);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestination);
-    // if(this.element.querySelector('.event__section--offers') !== null) {
-    //   this.element.querySelector('.event__available-offers').addEventListener('click', this.#checkOffer);
-    // }
+    if(this.element.querySelector('.event__section--offers') !== null) {
+      this.element.querySelector('.event__available-offers').addEventListener('click', this.#checkOffer);
+    }
   };
 
   _restoreHandlers = () => {

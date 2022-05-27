@@ -30,7 +30,7 @@ export const generatePoint = () => {
     destination: generateDestination().name,
     id: nanoid(),
     isFavorite: false,
-    offers,
+    offers: offers.map((item) => item.id),
     type
   };
 };
