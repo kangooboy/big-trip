@@ -87,7 +87,8 @@ const createEditPointTemplate = (data) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" 
+            name="event-destination" value="${destination}" list="destination-list-1">
             <datalist id="destination-list-1">
               ${createDestinationList(destinations)}
             </datalist>
@@ -95,10 +96,12 @@ const createEditPointTemplate = (data) => {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(dateFrom).format('DD/MM/YYYY HH:mm')}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" 
+            name="event-start-time" value="${dayjs(dateFrom).format('DD/MM/YYYY HH:mm')}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(dateTo).format('DD/MM/YYYY HH:mm')}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" 
+            name="event-end-time" value="${dayjs(dateTo).format('DD/MM/YYYY HH:mm')}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -106,7 +109,8 @@ const createEditPointTemplate = (data) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+            <input class="event__input  event__input--price" id="event-price-1" type="text" 
+            name="event-price" value="${basePrice}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -138,7 +142,7 @@ export default class EditPointView extends AbstractStatefulView {
 
   reset = (point) => {
     this.updateElement(
-      EditPointView.parsePointToState(point),
+      EditPointView.parsePointToState(point)
     );
   };
 
