@@ -1,24 +1,28 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
+import { allOffers } from '../mock/offer.js';
 import { calculateTimeDifference } from '../util.js';
 
-const createOffer = (offers) => offers.reduce((prev, curr) => {
-  const { title, price } = curr;
-
-  return `${prev}
-    <li class="event__offer">
-      <span class="event__offer-title">${title}</span>
-      &plus;&euro;&nbsp;
-      <span class="event__offer-price">${price}</span>
-    </li>`;
-}, '');
+const createOffer = (offers, type) => {
+  const offerIndex = allOffers.findIndex((item) => item.type === type);
+  const targetOffers = allOffers[offerIndex].offers.filter((item) => offers.some((el) => el === item.id));
+  return targetOffers.reduce((prev, curr) => {
+    const { title, price} = curr;
+    return`${prev}
+      <li class="event__offer">
+        <span class="event__offer-title">${title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${price}</span>
+      </li>`;
+  }, '');
+};
 
 const createPointTemplate = (point) => {
   const { basePrice, destination, offers, type, dateFrom, dateTo, isFavorite } = point;
 
-  const createHeaderOfferListTemplate = () => (offers.length > 0)?
+  const createHeaderOfferListTemplate = () => (offers !== []) ?
     `<h4 class="visually-hidden">Offers:</h4>
-     <ul class="event__selected-offers">${createOffer(offers)}</ul>`: '';
+     <ul class="event__selected-offers">${createOffer(offers, type)}</ul>` : '';
 
   const favoriteClassName = isFavorite
     ? 'event__favorite-btn event__favorite-btn--active'

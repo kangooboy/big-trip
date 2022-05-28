@@ -33,7 +33,7 @@ export default class PointPresenter {
 
     this.#pointComponent.setEditClickHandler(this.#replacePointToEdit);
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
-    this.#editPointComponent.setEditFormClickHandler(this.#replaceEditToPoint);
+    this.#editPointComponent.setEditFormClickHandler(this.#handleEditFormClose);
     this.#editPointComponent.setEditFormSubmitHandler(this.#handleEditFormSubmit);
 
     if(prevPointComponent === null || prevEditPointComponent === null) {
@@ -60,8 +60,13 @@ export default class PointPresenter {
 
   resetView = () => {
     if(this.#mode !== Mode.DEFAULT) {
+      this.#editPointComponent.reset(this.#point);
       this.#replaceEditToPoint();
     }
+  };
+
+  #handleEditFormClose = () => {
+    this.resetView();
   };
 
   #handleFavoriteClick = () => {
@@ -84,7 +89,7 @@ export default class PointPresenter {
   #escKeyDownHandler = (evt) => {
     if(evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.#replaceEditToPoint();
+      this.resetView();
     }
   };
 

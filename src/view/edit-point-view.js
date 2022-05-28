@@ -1,5 +1,6 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { destinations } from '../mock/destination.js';
+import { allOffers } from '../mock/offer.js';
 import dayjs from 'dayjs';
 
 const createDestinationImage = (destination) => {
@@ -7,49 +8,62 @@ const createDestinationImage = (destination) => {
   const createImages = (images) => images.reduce((prev, curr) => `${prev}
       <img class="event__photo" src="${curr.src}" alt="${curr.description}"></img>`, '');
 
-  return (pictures !== [])?(
+  return (pictures !== []) ? (
     `<div class="event__photos-container">
       <div class="event__photos-tape">
         ${createImages(pictures)}
       </div>
     </div>`
-  ):'';
+  ) : '';
 };
 
 const createDestination = (name) => {
   const destination = destinations.find((element) => element.name === name);
-  return (destination)?
+  return (destination) ?
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
       <p class="event__destination-description">${destination.description}</p>
       ${createDestinationImage(destination)}
-    </section>`:'';
+    </section>` : '';
 };
 
-const createOfferButtonsTemplate = (offers) => offers.reduce((prev, curr) => {
-  const { title, price } = curr;
-  const nameId = title.split(' ').slice(-1)[0];
-  return `${prev}
-    <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${nameId}-1" type="checkbox" name="event-offer-${nameId}" checked>
-      <label class="event__offer-label" for="event-offer-${nameId}-1">
-        <span class="event__offer-title">${title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${price}</span>
-      </label>
-    </div>`;
-}, '');
+const createDestinationList = (names) => names.reduce((prev, curr) => `${prev}
+<option value="${curr.name}"></option>`, '');
 
-const createOfferContainer = (offers) => (offers.length !== 0)?(
+const createOfferButtonsTemplate = (type, offers) => {
+  const offerIndex = allOffers.findIndex((item) => item.type === type);
+  const targetOffers = allOffers[offerIndex].offers;
+  return targetOffers.reduce((prev, curr) => {
+    const { title, price, id } = curr;
+    return `${prev}
+      <div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-${id}" 
+          type="checkbox" data-id=${curr.id} name="event-offer-${type}" ${(offers.some((item) => item === id)) ? 'checked' : ''}>
+        <label class="event__offer-label" for="event-offer-${type}-${id}">
+          <span class="event__offer-title">${title}</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${price}</span>
+        </label>
+      </div>`;
+  }, '');
+};
+
+const createOfferContainer = (type, offers) => (offers !== []) ? (
   `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${createOfferButtonsTemplate(offers)}
+      ${(createOfferButtonsTemplate(type, offers))}
     </div>
-  </section>`):'';
+  </section>`) : '';
 
-const createEditPointTemplate = (point) => {
-  const { basePrice, destination, offers, type, dateFrom, dateTo } = point;
+const createTypeOfPoint = (offers) => offers.reduce((prev, curr) => `${prev}
+  <div class="event__type-item">
+    <input id="event-type-${curr.type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${curr.type}">
+    <label class="event__type-label  event__type-label--${curr.type}" for="event-type-${curr.type}-1">${curr.type}</label>
+  </div>`, '');
+
+const createEditPointTemplate = (data) => {
+  const { basePrice, destination, type, offers, dateFrom, dateTo } = data;
   return (
     `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -64,51 +78,7 @@ const createEditPointTemplate = (point) => {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-
-                <div class="event__type-item">
-                  <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-                  <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-                  <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-                  <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-                  <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-                  <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-                  <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-                  <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-                  <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-                </div>
-
-                <div class="event__type-item">
-                  <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-                  <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-                </div>
+                ${createTypeOfPoint(allOffers)}
               </fieldset>
             </div>
           </div>
@@ -117,20 +87,21 @@ const createEditPointTemplate = (point) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" 
+            name="event-destination" value="${destination}" list="destination-list-1">
             <datalist id="destination-list-1">
-              <option value="Amsterdam"></option>
-              <option value="Geneva"></option>
-              <option value="Chamonix"></option>
+              ${createDestinationList(destinations)}
             </datalist>
           </div>
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(dateFrom).format('DD/MM/YYYY HH:mm')}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" 
+            name="event-start-time" value="${dayjs(dateFrom).format('DD/MM/YYYY HH:mm')}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(dateTo).format('DD/MM/YYYY HH:mm')}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" 
+            name="event-end-time" value="${dayjs(dateTo).format('DD/MM/YYYY HH:mm')}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -138,7 +109,8 @@ const createEditPointTemplate = (point) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+            <input class="event__input  event__input--price" id="event-price-1" type="text" 
+            name="event-price" value="${basePrice}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -148,7 +120,7 @@ const createEditPointTemplate = (point) => {
           </button>
         </header>
         <section class="event__details">
-          ${createOfferContainer(offers)}
+          ${createOfferContainer(type, offers)}
           ${createDestination(destination)}
         </section>
       </form>
@@ -156,17 +128,23 @@ const createEditPointTemplate = (point) => {
   );
 };
 
-export default class EditPointView extends AbstractView {
-  #point = null;
-
+export default class EditPointView extends AbstractStatefulView {
   constructor(point) {
     super();
-    this.#point = point;
+    this._state = EditPointView.parsePointToState(point);
+
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return createEditPointTemplate(this.#point);
+    return createEditPointTemplate(this._state);
   }
+
+  reset = (point) => {
+    this.updateElement(
+      EditPointView.parsePointToState(point)
+    );
+  };
 
   setEditFormClickHandler = (callback) => {
     this._callback.editFormClick = callback;
@@ -185,6 +163,65 @@ export default class EditPointView extends AbstractView {
 
   #editFormSubmit = (evt) => {
     evt.preventDefault();
-    this._callback.editFormSubmit(this.#point);
+    this._callback.editFormSubmit(EditPointView.parseStateToPoint(this._state));
+  };
+
+  #changeTypePoint = (evt) => {
+    if(evt.target.tagName !== 'INPUT') {
+      return;
+    }
+    const targetPoint = allOffers.find((item) => item.type === evt.target.value);
+    this.updateElement({
+      type: targetPoint.type,
+      offers: targetPoint.offers
+    });
+  };
+
+  #changeDestination = (evt) => {
+    if(evt.target.tagName !== 'INPUT') {
+      return;
+    }
+    const targetDestination = destinations.find((element) => element.name === evt.target.value);
+    this.updateElement({
+      destination: targetDestination.name
+    });
+  };
+
+  #checkOffer = (evt) => {
+    if(evt.target.tagName !== 'INPUT') {
+      return;
+    }
+    const offerId = evt.target.dataset.id;
+    const offers = this._state.offers.slice();
+    if(offers.some((item) => item === Number(offerId))) {
+      const offerIndex = offers.findIndex((item) => item === Number(offerId));
+      offers.splice(offerIndex, 1);
+    } else {
+      offers.push(Number(offerId));
+    }
+    this._setState({
+      offers: offers
+    });
+  };
+
+  static parsePointToState = (point) =>  JSON.parse(JSON.stringify(point));
+
+  static parseStateToPoint = (state) => {
+    const point = JSON.parse(JSON.stringify(state));
+    return point;
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypePoint);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestination);
+    if(this.element.querySelector('.event__section--offers') !== null) {
+      this.element.querySelector('.event__available-offers').addEventListener('click', this.#checkOffer);
+    }
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setEditFormClickHandler(this._callback.editFormClick);
+    this.setEditFormSubmitHandler(this._callback.editFormSubmit);
   };
 }
