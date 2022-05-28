@@ -166,7 +166,7 @@ export default class EditPointView extends AbstractStatefulView {
     this._callback.editFormSubmit(EditPointView.parseStateToPoint(this._state));
   };
 
-  #changeTypePointChange = (evt) => {
+  #changeTypePoint = (evt) => {
     if(evt.target.tagName !== 'INPUT') {
       return;
     }
@@ -200,14 +200,11 @@ export default class EditPointView extends AbstractStatefulView {
       offers.push(Number(offerId));
     }
     this._setState({
-      offers: [...offers]
+      offers: offers
     });
   };
 
-  static parsePointToState = (point) => {
-    const copyPoint = JSON.parse(JSON.stringify(point));
-    return copyPoint;
-  };
+  static parsePointToState = (point) =>  JSON.parse(JSON.stringify(point));
 
   static parseStateToPoint = (state) => {
     const point = JSON.parse(JSON.stringify(state));
@@ -215,7 +212,7 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #setInnerHandlers = () => {
-    this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypePointChange);
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypePoint);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestination);
     if(this.element.querySelector('.event__section--offers') !== null) {
       this.element.querySelector('.event__available-offers').addEventListener('click', this.#checkOffer);
