@@ -252,25 +252,28 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #setDatepicker = () => {
-    if (this._state.dateFrom && this._state.dateTo) {
-      this.#datepicker = flatpickr(
-        this.element.querySelector('input[name="event-start-time"]'),
-        {
-          enableTime: true,
-          dateFormat: 'Y-m-d H:i',
-          defaultDate: this._state.dateFrom,
-          onChange: this.#dateFromChangeHandler,
-        },
-      );
-      this.#datepicker = flatpickr(
-        this.element.querySelector('input[name="event-end-time"]'),
-        {
-          enableTime: true,
-          dateFormat: 'Y-m-d H:i',
-          defaultDate: this._state.dateTo,
-          onChange: this.#dateToChangeHandler,
-        },
-      );
+    if (!this._state.dateFrom || !this._state.dateTo) {
+      return;
     }
+    const flatpickrOption = {
+      enableTime: true,
+      dateFormat: 'Y-m-d H:i',
+    };
+    this.#datepicker = flatpickr(
+      this.element.querySelector('input[name="event-start-time"]'),
+      {
+        ...flatpickrOption,
+        defaultDate: this._state.dateFrom,
+        onChange: this.#dateFromChangeHandler,
+      },
+    );
+    this.#datepicker = flatpickr(
+      this.element.querySelector('input[name="event-end-time"]'),
+      {
+        ...flatpickrOption,
+        defaultDate: this._state.dateTo,
+        onChange: this.#dateToChangeHandler,
+      },
+    );
   };
 }
