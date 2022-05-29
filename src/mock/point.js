@@ -10,17 +10,19 @@ const generateDate = () => {
   if(!isDate) {
     generateDate();
   }
-  const maxDayGap = 7;
-  const daysGap = getRandomInt(-maxDayGap, -1);
+  const daysGap = getRandomInt(-7, 7);
   return dayjs().add(daysGap, 'day').toDate();
 };
 
 export const generatePoint = () => {
   const [hourFrom, hourTo] = randomRangeHours();
   const [minutesFrom, minutesTo] = randomRangeMinutes();
-  const randomDate = generateDate();
-  const dateFrom = dayjs(randomDate).format(`YYYY-MM-DDT${hourFrom}:${minutesFrom}`);
-  const dateTo = dayjs(randomDate).format(`YYYY-MM-DDT${hourTo}:${minutesTo}`);
+  const randomDate1 = generateDate();
+  const randomDate2 = generateDate();
+  const randomDateFrom = (randomDate1.getTime() > randomDate2.getTime()) ? randomDate2 : randomDate1;
+  const randomDateTo = (randomDate1.getTime() > randomDate2.getTime()) ? randomDate1 : randomDate2;
+  const dateFrom = dayjs(randomDateFrom).format(`YYYY-MM-DDT${hourFrom}:${minutesFrom}:ss.sss[Z]`);
+  const dateTo = dayjs(randomDateTo).format(`YYYY-MM-DDT${hourTo}:${minutesTo}:ss.sss[Z]`);
   const { offers, type } = generateOffer();
 
   return {
