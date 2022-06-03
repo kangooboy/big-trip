@@ -5,6 +5,17 @@ import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
+const BLANK_POINT = {
+  basePrice: null,
+  dateFrom: '',
+  dateTo: '',
+  destination: '',
+  id: '',
+  isFavorite: false,
+  offers: [],
+  type: ''
+};
+
 const createDestinationImage = (destination) => {
   const { pictures } = destination;
   const createImages = (images) => images.reduce((prev, curr) => `${prev}
@@ -133,10 +144,9 @@ const createEditPointTemplate = (data) => {
 export default class EditPointView extends AbstractStatefulView {
   #datepicker = null;
 
-  constructor(point) {
+  constructor(point = BLANK_POINT) {
     super();
     this._state = EditPointView.parsePointToState(point);
-
     this.#setInnerHandlers();
   }
 
@@ -168,6 +178,16 @@ export default class EditPointView extends AbstractStatefulView {
     this.element.querySelector('form').addEventListener('submit', this.#editFormSubmit);
   };
 
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
+  };
+
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteClick(EditPointView.parseStateToPoint(this._state));
+  };
+
   #editFormClick = (evt) => {
     evt.preventDefault();
     this._callback.editFormClick();
@@ -190,7 +210,7 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #changeDestination = (evt) => {
-    if(evt.target.tagName !== 'INPUT') {
+    if(evt.target.tagName !== 'INPUT' || evt.target.value === '') {
       return;
     }
     const targetDestination = destinations.find((element) => element.name === evt.target.value);
@@ -228,7 +248,7 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
-  static parsePointToState = (point) =>  JSON.parse(JSON.stringify(point));
+  static parsePointToState = (point) => JSON.parse(JSON.stringify(point));
 
   static parseStateToPoint = (state) => {
     const point = JSON.parse(JSON.stringify(state));
@@ -248,6 +268,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setEditFormClickHandler(this._callback.editFormClick);
     this.setEditFormSubmitHandler(this._callback.editFormSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
     this.#setDatepicker();
   };
 

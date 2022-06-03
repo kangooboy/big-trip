@@ -1,4 +1,11 @@
 import dayjs from 'dayjs';
+import { FilterType } from './const.js';
+
+const filter = {
+  [FilterType.EVERYTHING]: (points) => points,
+  [FilterType.FUTURE]: (points) => points.filter((point) => dayjs().isBefore(point.dateFrom, 'D')),
+  [FilterType.PAST]: (points) => points.filter((point) => dayjs().isAfter(point.dateFrom, 'D'))
+};
 
 const getRandomInt = function (first, second) {
   const min = (first < second) ? Math.ceil(first) : Math.floor(second);
@@ -24,15 +31,6 @@ const randomRangeMinutes = () => {
   const int1 = getRandomInt(1, 59);
   const int2 = getRandomInt(1, 59);
   return randomRange(int1, int2);
-};
-
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if(index === -1) {
-    return items;
-  }
-  return [...items.slice(0, index), update, ...items.slice(index + 1),];
 };
 
 const calculateTimeDifference = (dateFrom, dateTo) => {
@@ -75,4 +73,4 @@ const sortByTime = (a, b) => {
 
 const sortByPrice = (a, b) => b.basePrice - a.basePrice;
 
-export { getRandomInt, updateItem,  randomRangeHours, randomRangeMinutes, calculateTimeDifference, sortByDay, sortByTime, sortByPrice};
+export { filter, getRandomInt, randomRangeHours, randomRangeMinutes, calculateTimeDifference, sortByDay, sortByTime, sortByPrice};

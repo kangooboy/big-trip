@@ -641,7 +641,7 @@ main {
   padding: 5px 2px;
   margin-right: 18px;
   border-bottom: 1px solid #0d8ae4; }
-  .event__field-group--destination {
+  .--destination {
     width: 290px; }
 
 .event__label {
@@ -666,7 +666,7 @@ main {
     .event__input--destination::-webkit-calendar-picker-indicator {
       display: none; }
   .event__input--time {
-    width: 130px;
+    width: 135px;
     text-align: center; }
   .event__input--price {
     width: 66px; }

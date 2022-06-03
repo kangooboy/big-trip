@@ -1,6 +1,7 @@
 import PointView from '../view/point-view.js';
 import EditPointView from '../view/edit-point-view.js';
 import { render, replace, remove } from '../framework/render.js';
+import {UserAction, UpdateType} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -35,6 +36,7 @@ export default class PointPresenter {
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#editPointComponent.setEditFormClickHandler(this.#handleEditFormClose);
     this.#editPointComponent.setEditFormSubmitHandler(this.#handleEditFormSubmit);
+    this.#editPointComponent.setDeleteClickHandler(this.#handleDeleteClick);
 
     if(prevPointComponent === null || prevEditPointComponent === null) {
       render(this.#pointComponent, this.#tripListContainer);
@@ -69,8 +71,20 @@ export default class PointPresenter {
     this.resetView();
   };
 
+  #handleDeleteClick = (point) => {
+    this.#changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
+  };
+
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#point, isFavorite: !this.#point.isFavorite});
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      {...this.#point, isFavorite: !this.#point.isFavorite},
+    );
   };
 
   #replacePointToEdit = () => {
@@ -93,8 +107,12 @@ export default class PointPresenter {
     }
   };
 
-  #handleEditFormSubmit = (point) => {
-    this.#changeData(point);
+  #handleEditFormSubmit = (update) => {
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      update,
+    );
     this.#replaceEditToPoint();
   };
 }
