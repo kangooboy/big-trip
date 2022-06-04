@@ -1,19 +1,27 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { destinations } from '../mock/destination.js';
 import { allOffers } from '../mock/offer.js';
+import { generateDestination } from '../mock/destination.js';
+import { generateOffer } from '../mock/offer.js';
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-const BLANK_POINT = {
-  basePrice: null,
-  dateFrom: '',
-  dateTo: '',
-  destination: '',
-  id: '',
-  isFavorite: false,
-  offers: [],
-  type: ''
+const generateBlankPoint = () => {
+  const { offers, type } = generateOffer();
+
+  return {
+    basePrice: '',
+    dateFrom: dayjs(),
+    dateTo: dayjs(),
+    destination: generateDestination().name,
+    id: nanoid(),
+    isFavorite: false,
+    offers: offers.map((item) => item.id),
+    type,
+    newPoint: true
+  };
 };
 
 const createDestinationImage = (destination) => {
@@ -46,6 +54,7 @@ const createDestinationList = (names) => names.reduce((prev, curr) => `${prev}
 const createOfferButtonsTemplate = (type, offers) => {
   const offerIndex = allOffers.findIndex((item) => item.type === type);
   const targetOffers = allOffers[offerIndex].offers;
+
   return targetOffers.reduce((prev, curr) => {
     const { title, price, id } = curr;
     return `${prev}
@@ -76,7 +85,7 @@ const createTypeOfPoint = (offers) => offers.reduce((prev, curr) => `${prev}
   </div>`, '');
 
 const createEditPointTemplate = (data) => {
-  const { basePrice, destination, type, offers, dateFrom, dateTo } = data;
+  const { basePrice, destination, type, offers, dateFrom, dateTo, newPoint } = data;
   return (
     `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -127,8 +136,8 @@ const createEditPointTemplate = (data) => {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-          <button class="event__rollup-btn" type="button">
+          <button class="event__reset-btn" type="reset">${(newPoint) ? 'Cancel' : 'Delete'}</button>
+          ${(newPoint) ? '' : '<button class="event__rollup-btn" type="button">'}
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
@@ -144,7 +153,7 @@ const createEditPointTemplate = (data) => {
 export default class EditPointView extends AbstractStatefulView {
   #datepicker = null;
 
-  constructor(point = BLANK_POINT) {
+  constructor(point = generateBlankPoint()) {
     super();
     this._state = EditPointView.parsePointToState(point);
     this.#setInnerHandlers();
@@ -169,6 +178,9 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   setEditFormClickHandler = (callback) => {
+    if(this._state.newPoint) {
+      return;
+    }
     this._callback.editFormClick = callback;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editFormClick);
   };
@@ -219,6 +231,15 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
+  #changePrice = (evt) => {
+    if(evt.target.tagName !== 'INPUT') {
+      return;
+    }
+    this.updateElement({
+      basePrice: evt.target.value
+    });
+  };
+
   #checkOffer = (evt) => {
     if(evt.target.tagName !== 'INPUT') {
       return;
@@ -238,13 +259,13 @@ export default class EditPointView extends AbstractStatefulView {
 
   #dateFromChangeHandler = (dateFrom) => {
     this.updateElement({
-      dateFrom,
+      dateFrom
     });
   };
 
   #dateToChangeHandler = (dateTo) => {
     this.updateElement({
-      dateTo,
+      dateTo
     });
   };
 
@@ -252,12 +273,16 @@ export default class EditPointView extends AbstractStatefulView {
 
   static parseStateToPoint = (state) => {
     const point = JSON.parse(JSON.stringify(state));
+    if(point.newPoint) {
+      delete point.newPoint;
+    }
     return point;
   };
 
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypePoint);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestination);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#changePrice);
     if(this.element.querySelector('.event__section--offers') !== null) {
       this.element.querySelector('.event__available-offers').addEventListener('click', this.#checkOffer);
     }
@@ -293,6 +318,7 @@ export default class EditPointView extends AbstractStatefulView {
       {
         ...flatpickrOption,
         defaultDate: this._state.dateTo,
+        minDate: this._state.dateFrom,
         onChange: this.#dateToChangeHandler,
       },
     );

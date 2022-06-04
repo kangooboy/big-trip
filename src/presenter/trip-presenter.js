@@ -57,7 +57,7 @@ export default class TripPresenter {
 
   createTask = (callback) => {
     this.#currentSortType = SortType.DAY;
-    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#filterModel.setFilter(UpdateType.MINOR, FilterType.EVERYTHING);
     this.#pointNewPresenter.init(callback);
   };
 
@@ -123,10 +123,6 @@ export default class TripPresenter {
         this.#pointPresenter.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
-        this.#clearPointList();
-        this.#renderTrip();
-        break;
-      case UpdateType.MAJOR:
         this.#clearPointList();
         this.#renderTrip();
         break;
