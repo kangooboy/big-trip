@@ -151,7 +151,8 @@ const createEditPointTemplate = (data) => {
 };
 
 export default class EditPointView extends AbstractStatefulView {
-  #datepicker = null;
+  #datepickerFrom = null;
+  #datepickerTo = null;
 
   constructor(point = generateBlankPoint()) {
     super();
@@ -165,9 +166,11 @@ export default class EditPointView extends AbstractStatefulView {
 
   removeElement = () => {
     super.removeElement();
-    if (this.#datepicker) {
-      this.#datepicker.destroy();
-      this.#datepicker = null;
+    if (this.#datepickerFrom || this.#datepickerTo) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerTo.destroy();
+      this.#datepickerFrom = null;
+      this.#datepickerTo = null;
     }
   };
 
@@ -257,18 +260,6 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
-  #dateFromChangeHandler = (dateFrom) => {
-    this.updateElement({
-      dateFrom
-    });
-  };
-
-  #dateToChangeHandler = (dateTo) => {
-    this.updateElement({
-      dateTo
-    });
-  };
-
   static parsePointToState = (point) => JSON.parse(JSON.stringify(point));
 
   static parseStateToPoint = (state) => {
@@ -297,6 +288,18 @@ export default class EditPointView extends AbstractStatefulView {
     this.#setDatepicker();
   };
 
+  #dateFromChangeHandler = ([dateFrom]) => {
+    this.updateElement({
+      dateFrom
+    });
+  };
+
+  #dateToChangeHandler = ([dateTo]) => {
+    this.updateElement({
+      dateTo
+    });
+  };
+
   #setDatepicker = () => {
     if (!this._state.dateFrom || !this._state.dateTo) {
       return;
@@ -305,20 +308,21 @@ export default class EditPointView extends AbstractStatefulView {
       enableTime: true,
       dateFormat: 'Y-m-d H:i',
     };
-    this.#datepicker = flatpickr(
+    this.#datepickerFrom = flatpickr(
       this.element.querySelector('input[name="event-start-time"]'),
       {
         ...flatpickrOption,
+        maxDate: this._state.dateTo,
         defaultDate: this._state.dateFrom,
         onChange: this.#dateFromChangeHandler,
       },
     );
-    this.#datepicker = flatpickr(
+    this.#datepickerTo = flatpickr(
       this.element.querySelector('input[name="event-end-time"]'),
       {
         ...flatpickrOption,
-        defaultDate: this._state.dateTo,
         minDate: this._state.dateFrom,
+        defaultDate: this._state.dateTo,
         onChange: this.#dateToChangeHandler,
       },
     );
