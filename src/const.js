@@ -13,6 +13,7 @@ const SortType = {
 const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
+  MAJOR: 'MAJOR'
 };
 
 const UserAction = {

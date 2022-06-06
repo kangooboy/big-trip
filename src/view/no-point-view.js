@@ -9,8 +9,8 @@ const NoPointTextType = {
 
 
 const createNoPointTemplate = (filterType) => {
-  const NoPointTextValue = NoPointTextType[filterType];
-  return (`<p class="trip-events__msg">${NoPointTextValue}</p>`);
+  const noPointTextValue = NoPointTextType[filterType];
+  return (`<p class="trip-events__msg">${noPointTextValue}</p>`);
 };
 
 export default class NoPointView extends AbstractView {

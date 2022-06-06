@@ -51,7 +51,7 @@ const createDestination = (name) => {
 const createDestinationList = (names) => names.reduce((prev, curr) => `${prev}
 <option value="${curr.name}"></option>`, '');
 
-const createOfferButtonsTemplate = (type, offers) => {
+const createOfferButtonsTemplate = (type, offers, newPoint) => {
   const offerIndex = allOffers.findIndex((item) => item.type === type);
   const targetOffers = allOffers[offerIndex].offers;
 
@@ -60,7 +60,8 @@ const createOfferButtonsTemplate = (type, offers) => {
     return `${prev}
       <div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-${id}" 
-          type="checkbox" data-id=${curr.id} name="event-offer-${type}" ${(offers.some((item) => item === id)) ? 'checked' : ''}>
+          type="checkbox" data-id=${curr.id} name="event-offer-${type}" 
+          ${(offers.some((item) => item === id) && !newPoint) ? 'checked' : ''}>
         <label class="event__offer-label" for="event-offer-${type}-${id}">
           <span class="event__offer-title">${title}</span>
           &plus;&euro;&nbsp;
@@ -70,11 +71,11 @@ const createOfferButtonsTemplate = (type, offers) => {
   }, '');
 };
 
-const createOfferContainer = (type, offers) => (offers !== []) ? (
+const createOfferContainer = (type, offers, newPoint) => (offers !== []) ? (
   `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${(createOfferButtonsTemplate(type, offers))}
+      ${(createOfferButtonsTemplate(type, offers, newPoint))}
     </div>
   </section>`) : '';
 
@@ -132,17 +133,14 @@ const createEditPointTemplate = (data) => {
               &euro;
             </label>
             <input class="event__input  event__input--price" id="event-price-1" type="text" 
-            name="event-price" value="${basePrice}">
+            name="event-price" value="${basePrice}" pattern="^[1-9]+[0-9]*$">
           </div>
-
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">${(newPoint) ? 'Cancel' : 'Delete'}</button>
-          ${(newPoint) ? '' : '<button class="event__rollup-btn" type="button">'}
-            <span class="visually-hidden">Open event</span>
-          </button>
+          ${(newPoint) ? '' : '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>'}
         </header>
         <section class="event__details">
-          ${createOfferContainer(type, offers)}
+          ${createOfferContainer(type, offers, newPoint)}
           ${createDestination(destination)}
         </section>
       </form>
@@ -235,10 +233,10 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #changePrice = (evt) => {
-    if(evt.target.tagName !== 'INPUT') {
+    if(evt.target.tagName !== 'INPUT' || isNaN(Number(evt.target.value))) {
       return;
     }
-    this.updateElement({
+    this._setState({
       basePrice: evt.target.value
     });
   };

@@ -55,9 +55,9 @@ export default class TripPresenter {
     this.#renderTrip();
   };
 
-  createTask = (callback) => {
+  createPoint = (callback) => {
     this.#currentSortType = SortType.DAY;
-    this.#filterModel.setFilter(UpdateType.MINOR, FilterType.EVERYTHING);
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#pointNewPresenter.init(callback);
   };
 
@@ -81,6 +81,7 @@ export default class TripPresenter {
   };
 
   #handleModeChange = () => {
+    this.#pointNewPresenter.destroy();
     this.#pointPresenter.forEach((presenter) => presenter.resetView());
   };
 
@@ -109,12 +110,15 @@ export default class TripPresenter {
     render(this.#sortComponent, this.#tripContainer);
   };
 
-  #clearPointList = () => {
+  #clearPointList = ({resetSortType = false} = {}) => {
     this.#pointNewPresenter.destroy();
     this.#pointPresenter.forEach((presenter) => presenter.destroy());
     this.#pointPresenter.clear();
     remove(this.#sortComponent);
     remove(this.#noPointComponent);
+    if (resetSortType) {
+      this.#currentSortType = SortType.DAY;
+    }
   };
 
   #handleModelEvent = (updateType, data) => {
@@ -124,6 +128,10 @@ export default class TripPresenter {
         break;
       case UpdateType.MINOR:
         this.#clearPointList();
+        this.#renderTrip();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearPointList({resetSortType: true});
         this.#renderTrip();
         break;
     }

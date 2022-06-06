@@ -633,7 +633,7 @@ main {
   -webkit-transform: translate(-50%, -50%) rotate(225deg);
           transform: translate(-50%, -50%) rotate(225deg); }
 
-.{
+.event__field-group {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
