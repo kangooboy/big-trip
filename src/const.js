@@ -1,6 +1,25 @@
-const FILTERS = ['everthing', 'future', 'past'];
-const DAY = 'day';
-const PRICE = 'price';
-const TIME = 'time';
+const FilterType = {
+  EVERYTHING: 'everthing',
+  FUTURE: 'future',
+  PAST: 'past'
+};
 
-export { FILTERS, DAY, PRICE, TIME };
+const SortType = {
+  DAY: 'day',
+  PRICE: 'price',
+  TIME: 'time'
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR'
+};
+
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+export { FilterType, SortType, UpdateType, UserAction };

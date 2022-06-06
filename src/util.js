@@ -1,4 +1,11 @@
 import dayjs from 'dayjs';
+import { FilterType } from './const.js';
+
+const filter = {
+  [FilterType.EVERYTHING]: (points) => points,
+  [FilterType.FUTURE]: (points) => points.filter((point) => dayjs().isBefore(point.dateFrom, 'D')),
+  [FilterType.PAST]: (points) => points.filter((point) => dayjs().isAfter(point.dateFrom, 'D'))
+};
 
 const getRandomInt = function (first, second) {
   const min = (first < second) ? Math.ceil(first) : Math.floor(second);
@@ -26,39 +33,42 @@ const randomRangeMinutes = () => {
   return randomRange(int1, int2);
 };
 
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if(index === -1) {
-    return items;
-  }
-  return [...items.slice(0, index), update, ...items.slice(index + 1),];
-};
-
 const calculateTimeDifference = (dateFrom, dateTo) => {
 
-  let days = dayjs(dateTo).diff(dayjs(dateFrom), 'day');
-  let hours = dayjs(dateTo).diff(dayjs(dateFrom), 'hours');
-  hours -= days * 24;
+  const daysCount = dayjs(dateTo).diff(dayjs(dateFrom), 'day');
+  let hoursCount = dayjs(dateTo).diff(dayjs(dateFrom), 'hours');
+  hoursCount -= daysCount * 24;
   const allInMinutes = dayjs(dateTo).diff(dateFrom, 'minutes');
-  let minutes = allInMinutes % 60;
+  const minutesCount = allInMinutes % 60;
 
-  minutes = (minutes < 10) ? `0${minutes}` : minutes;
-  hours = (hours < 10) ? `0${hours}` : hours;
-  days = (days < 10) ? `0${days}` : days;
+  const getMinutes = () => {
+    if(minutesCount === 0) {
+      return '00M';
+    }
+    return (minutesCount < 10) ? `0${minutesCount}M` : `${minutesCount}M`;
+  };
 
-  if(days === '00') {
-    days = '';
-  } else {
-    days += 'D';
-  }
-  if(hours === '00') {
-    return `${minutes}M`;
-  }
-  if(minutes === '00') {
-    return `${hours}H`;
-  }
-  return `${days} ${hours}H ${minutes}M`;
+  const getHours = () => {
+    if(daysCount === 0 && hoursCount === 0 && minutesCount !== 0) {
+      return '';
+    }
+    if(daysCount !== 0 && hoursCount === 0 && minutesCount !== 0) {
+      return '00H';
+    }
+    return (hoursCount < 10) ? `0${hoursCount}H` : `${hoursCount}H`;
+  };
+
+  const getDays = () => {
+    if(hoursCount === 0 && daysCount === 0 && minutesCount === 0) {
+      return '00D';
+    }
+    if(daysCount === 0) {
+      return '';
+    }
+    return (daysCount < 10) ? `0${daysCount}D` : `${daysCount}D`;
+  };
+
+  return `${getDays()} ${getHours()} ${getMinutes()}`;
 };
 
 const sortByDay = (a, b) => {
@@ -75,4 +85,4 @@ const sortByTime = (a, b) => {
 
 const sortByPrice = (a, b) => b.basePrice - a.basePrice;
 
-export { getRandomInt, updateItem,  randomRangeHours, randomRangeMinutes, calculateTimeDifference, sortByDay, sortByTime, sortByPrice};
+export { filter, getRandomInt, randomRangeHours, randomRangeMinutes, calculateTimeDifference, sortByDay, sortByTime, sortByPrice};
