@@ -38,8 +38,8 @@ const createDestinationImage = (destination) => {
   ) : '';
 };
 
-const createDestination = (name) => {
-  const destination = destinations.find((element) => element.name === name);
+const createDestination = (name, allDestinations) => {
+  const destination = allDestinations.find((element) => element.name === name);
   return (destination) ?
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -85,7 +85,7 @@ const createTypeOfPoint = (offers) => offers.reduce((prev, curr) => `${prev}
     <label class="event__type-label  event__type-label--${curr.type}" for="event-type-${curr.type}-1">${curr.type}</label>
   </div>`, '');
 
-const createEditPointTemplate = (data) => {
+const createEditPointTemplate = (data, allDestinations) => {
   const { basePrice, destination, type, offers, dateFrom, dateTo, newPoint } = data;
   return (
     `<li class="trip-events__item">
@@ -111,9 +111,9 @@ const createEditPointTemplate = (data) => {
               ${type}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" 
-            name="event-destination" value="${destination}" list="destination-list-1">
+            name="event-destination" value="${destination.name}" list="destination-list-1">
             <datalist id="destination-list-1">
-              ${createDestinationList(destinations)}
+              ${createDestinationList(allDestinations)}
             </datalist>
           </div>
 
@@ -141,7 +141,7 @@ const createEditPointTemplate = (data) => {
         </header>
         <section class="event__details">
           ${createOfferContainer(type, offers, newPoint)}
-          ${createDestination(destination)}
+          ${createDestination(destination.name, allDestinations)}
         </section>
       </form>
     </li>`
@@ -158,10 +158,11 @@ export default class EditPointView extends AbstractStatefulView {
     this._state = EditPointView.parsePointToState(point);
     this.#setInnerHandlers();
     this.#allDestinations = allDestinations;
+    console.log(this.#allDestinations);
   }
 
   get template() {
-    return createEditPointTemplate(this._state);
+    return createEditPointTemplate(this._state, this.#allDestinations);
   }
 
   removeElement = () => {
