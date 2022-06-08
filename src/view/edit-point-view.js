@@ -4,7 +4,7 @@ import { allOffers } from '../mock/offer.js';
 import { generateDestination } from '../mock/destination.js';
 import { generateOffer } from '../mock/offer.js';
 import dayjs from 'dayjs';
-import {nanoid} from 'nanoid';
+
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -16,7 +16,7 @@ const generateBlankPoint = () => {
     dateFrom: dayjs(),
     dateTo: dayjs(),
     destination: generateDestination().name,
-    id: nanoid(),
+    id: '',
     isFavorite: false,
     offers: offers.map((item) => item.id),
     type,
@@ -133,7 +133,7 @@ const createEditPointTemplate = (data) => {
               &euro;
             </label>
             <input class="event__input  event__input--price" id="event-price-1" type="text" 
-            name="event-price" value="${basePrice}" pattern="^[1-9]+[0-9]*$">
+            name="event-price" value="${basePrice}" pattern="^[0-9]+[0-9]*$">
           </div>
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">${(newPoint) ? 'Cancel' : 'Delete'}</button>
@@ -151,11 +151,13 @@ const createEditPointTemplate = (data) => {
 export default class EditPointView extends AbstractStatefulView {
   #datepickerFrom = null;
   #datepickerTo = null;
+  #allDestinations = null;
 
-  constructor(point = generateBlankPoint()) {
+  constructor(point = generateBlankPoint(), allDestinations) {
     super();
     this._state = EditPointView.parsePointToState(point);
     this.#setInnerHandlers();
+    this.#allDestinations = allDestinations;
   }
 
   get template() {
