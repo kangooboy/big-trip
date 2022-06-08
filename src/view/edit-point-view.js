@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { destinations } from '../mock/destination.js';
+// import { destinations } from '../mock/destination.js';
 import { allOffers } from '../mock/offer.js';
 import { generateDestination } from '../mock/destination.js';
 import { generateOffer } from '../mock/offer.js';
@@ -158,7 +158,6 @@ export default class EditPointView extends AbstractStatefulView {
     this._state = EditPointView.parsePointToState(point);
     this.#setInnerHandlers();
     this.#allDestinations = allDestinations;
-    console.log(this.#allDestinations);
   }
 
   get template() {
@@ -229,7 +228,7 @@ export default class EditPointView extends AbstractStatefulView {
     if(evt.target.tagName !== 'INPUT' || evt.target.value === '') {
       return;
     }
-    const targetDestination = destinations.find((element) => element.name === evt.target.value);
+    const targetDestination = this.#allDestinations.find((element) => element.name === evt.target.value);
     this.updateElement({
       destination: targetDestination.name
     });
