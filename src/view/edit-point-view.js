@@ -1,28 +1,8 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { destinations } from '../mock/destination.js';
-import { allOffers } from '../mock/offer.js';
-import { generateDestination } from '../mock/destination.js';
-import { generateOffer } from '../mock/offer.js';
 import dayjs from 'dayjs';
-import {nanoid} from 'nanoid';
+
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-
-const generateBlankPoint = () => {
-  const { offers, type } = generateOffer();
-
-  return {
-    basePrice: '',
-    dateFrom: dayjs(),
-    dateTo: dayjs(),
-    destination: generateDestination().name,
-    id: nanoid(),
-    isFavorite: false,
-    offers: offers.map((item) => item.id),
-    type,
-    newPoint: true
-  };
-};
 
 const createDestinationImage = (destination) => {
   const { pictures } = destination;
@@ -38,8 +18,8 @@ const createDestinationImage = (destination) => {
   ) : '';
 };
 
-const createDestination = (name) => {
-  const destination = destinations.find((element) => element.name === name);
+const createDestination = (name, allDestinations) => {
+  const destination = allDestinations.find((element) => element.name === name);
   return (destination) ?
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -51,7 +31,7 @@ const createDestination = (name) => {
 const createDestinationList = (names) => names.reduce((prev, curr) => `${prev}
 <option value="${curr.name}"></option>`, '');
 
-const createOfferButtonsTemplate = (type, offers, newPoint) => {
+const createOfferButtonsTemplate = (type, offers, allOffers, newPoint) => {
   const offerIndex = allOffers.findIndex((item) => item.type === type);
   const targetOffers = allOffers[offerIndex].offers;
 
@@ -71,11 +51,11 @@ const createOfferButtonsTemplate = (type, offers, newPoint) => {
   }, '');
 };
 
-const createOfferContainer = (type, offers, newPoint) => (offers !== []) ? (
+const createOfferContainer = (type, offers, allOffers, newPoint) => (offers !== []) ? (
   `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${(createOfferButtonsTemplate(type, offers, newPoint))}
+      ${(createOfferButtonsTemplate(type, offers, allOffers, newPoint))}
     </div>
   </section>`) : '';
 
@@ -85,7 +65,7 @@ const createTypeOfPoint = (offers) => offers.reduce((prev, curr) => `${prev}
     <label class="event__type-label  event__type-label--${curr.type}" for="event-type-${curr.type}-1">${curr.type}</label>
   </div>`, '');
 
-const createEditPointTemplate = (data) => {
+const createEditPointTemplate = (data, allDestinations, allOffers) => {
   const { basePrice, destination, type, offers, dateFrom, dateTo, newPoint } = data;
   return (
     `<li class="trip-events__item">
@@ -111,9 +91,9 @@ const createEditPointTemplate = (data) => {
               ${type}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" 
-            name="event-destination" value="${destination}" list="destination-list-1">
+            name="event-destination" ${(destination) ? `value=${destination.name}` : 'placeholder="choose target city"'} list="destination-list-1" required>
             <datalist id="destination-list-1">
-              ${createDestinationList(destinations)}
+              ${createDestinationList(allDestinations)}
             </datalist>
           </div>
 
@@ -133,15 +113,15 @@ const createEditPointTemplate = (data) => {
               &euro;
             </label>
             <input class="event__input  event__input--price" id="event-price-1" type="text" 
-            name="event-price" value="${basePrice}" pattern="^[1-9]+[0-9]*$">
+            name="event-price" value="${basePrice}" pattern="^[1-9]+[0-9]*$" required>
           </div>
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">${(newPoint) ? 'Cancel' : 'Delete'}</button>
           ${(newPoint) ? '' : '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>'}
         </header>
         <section class="event__details">
-          ${createOfferContainer(type, offers, newPoint)}
-          ${createDestination(destination)}
+          ${createOfferContainer(type, offers, allOffers, newPoint)}
+          ${createDestination(destination.name, allDestinations)}
         </section>
       </form>
     </li>`
@@ -151,15 +131,19 @@ const createEditPointTemplate = (data) => {
 export default class EditPointView extends AbstractStatefulView {
   #datepickerFrom = null;
   #datepickerTo = null;
+  #allDestinations = null;
+  #allOffers = null;
 
-  constructor(point = generateBlankPoint()) {
+  constructor(point, allDestinations, allOffers) {
     super();
     this._state = EditPointView.parsePointToState(point);
+    this.#allDestinations = allDestinations;
+    this.#allOffers = allOffers;
     this.#setInnerHandlers();
   }
 
   get template() {
-    return createEditPointTemplate(this._state);
+    return createEditPointTemplate(this._state, this.#allDestinations, this.#allOffers);
   }
 
   removeElement = () => {
@@ -215,10 +199,11 @@ export default class EditPointView extends AbstractStatefulView {
     if(evt.target.tagName !== 'INPUT') {
       return;
     }
-    const targetPoint = allOffers.find((item) => item.type === evt.target.value);
+    const targetPoint = this.#allOffers.find((item) => item.type === evt.target.value);
+    const targetOffersId = targetPoint.offers.map((item) => item.id);
     this.updateElement({
       type: targetPoint.type,
-      offers: targetPoint.offers
+      offers: targetOffersId
     });
   };
 
@@ -226,14 +211,14 @@ export default class EditPointView extends AbstractStatefulView {
     if(evt.target.tagName !== 'INPUT' || evt.target.value === '') {
       return;
     }
-    const targetDestination = destinations.find((element) => element.name === evt.target.value);
+    const targetDestination = this.#allDestinations.find((element) => element.name === evt.target.value);
     this.updateElement({
-      destination: targetDestination.name
+      destination: targetDestination
     });
   };
 
   #changePrice = (evt) => {
-    if(evt.target.tagName !== 'INPUT' || isNaN(Number(evt.target.value))) {
+    if(evt.target.tagName !== 'INPUT' || isNaN(Number(evt.target.value)) || Number(evt.target.value) <= 0) {
       return;
     }
     this._setState({
@@ -246,7 +231,7 @@ export default class EditPointView extends AbstractStatefulView {
       return;
     }
     const offerId = evt.target.dataset.id;
-    const offers = this._state.offers.slice();
+    const offers = [...this._state.offers];
     if(offers.some((item) => item === Number(offerId))) {
       const offerIndex = offers.findIndex((item) => item === Number(offerId));
       offers.splice(offerIndex, 1);
@@ -258,10 +243,18 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
-  static parsePointToState = (point) => JSON.parse(JSON.stringify(point));
+  static parsePointToState = (point) => Object.assign({
+    isDisabled: false,
+    isSaving: false,
+    isDeleting: false,},
+  point);
 
   static parseStateToPoint = (state) => {
     const point = JSON.parse(JSON.stringify(state));
+    point.basePrice = Number(point.basePrice);
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
     if(point.newPoint) {
       delete point.newPoint;
     }

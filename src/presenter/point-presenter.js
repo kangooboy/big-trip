@@ -1,7 +1,7 @@
 import PointView from '../view/point-view.js';
 import EditPointView from '../view/edit-point-view.js';
 import { render, replace, remove } from '../framework/render.js';
-import {UserAction, UpdateType} from '../const.js';
+import { UserAction, UpdateType } from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -9,6 +9,7 @@ const Mode = {
 };
 
 export default class PointPresenter {
+  #pointsModel = null;
   #tripListContainer = null;
   #pointComponent = null;
   #editPointComponent = null;
@@ -23,14 +24,14 @@ export default class PointPresenter {
     this.#changeMode = changeMode;
   }
 
-  init = (point) => {
+  init = (point, allDestinations, allOffers) => {
     this.#point = point;
 
     const prevPointComponent = this.#pointComponent;
     const prevEditPointComponent = this.#editPointComponent;
 
-    this.#pointComponent = new PointView(point);
-    this.#editPointComponent = new EditPointView(point);
+    this.#pointComponent = new PointView(point, allOffers);
+    this.#editPointComponent = new EditPointView(point, allDestinations, allOffers);
 
     this.#pointComponent.setEditClickHandler(this.#replacePointToEdit);
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
