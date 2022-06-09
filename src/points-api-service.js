@@ -23,7 +23,7 @@ export default class PointsApiService extends ApiService {
       .then(ApiService.parseResponse);
   }
 
-  updateTask = async (point) => {
+  updatePoint = async (point) => {
     const response = await this._load({
       url: `points/${point.id}`,
       method: Method.PUT,
@@ -36,6 +36,28 @@ export default class PointsApiService extends ApiService {
     return parsedResponse;
   };
 
+  addPoint = async (point) => {
+    const response = await this._load({
+      url: 'points',
+      method: Method.POST,
+      body: JSON.stringify(this.#adaptToServer(point)),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    });
+
+    const parsedResponse = await ApiService.parseResponse(response);
+
+    return parsedResponse;
+  };
+
+  deletePoint = async (point) => {
+    const response = await this._load({
+      url: `points/${point.id}`,
+      method: Method.DELETE,
+    });
+
+    return response;
+  };
+
   #adaptToServer = (point) => {
     const adaptedPoint = {...point,
       'base_price': point.basePrice,
@@ -44,10 +66,10 @@ export default class PointsApiService extends ApiService {
       'is_favorite': point.isFavorite
     };
 
-    delete adaptedPoint.dueDate;
-    delete adaptedPoint.isArchive;
+    delete adaptedPoint.basePrice;
+    delete adaptedPoint.dateFrom;
+    delete adaptedPoint.dateTo;
     delete adaptedPoint.isFavorite;
-    delete adaptedPoint.repeating;
 
     return adaptedPoint;
   };

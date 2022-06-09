@@ -28,9 +28,10 @@ const handleNewPointButtonClick = () => {
   newPointButtonComponent.element.disabled = true;
 };
 
-render(newPointButtonComponent, tripHeaderContainer);
-newPointButtonComponent.setNewPointClickHandler(handleNewPointButtonClick);
-
 filterPresenter.init();
 tripPresenter.init();
-pointsModel.init();
+pointsModel.init()
+  .finally(() => {
+    render(newPointButtonComponent, tripHeaderContainer);
+    newPointButtonComponent.setNewPointClickHandler(handleNewPointButtonClick);
+  });

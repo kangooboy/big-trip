@@ -7,32 +7,6 @@ const filter = {
   [FilterType.PAST]: (points) => points.filter((point) => dayjs().isAfter(point.dateFrom, 'D'))
 };
 
-const getRandomInt = function (first, second) {
-  const min = (first < second) ? Math.ceil(first) : Math.floor(second);
-  const max = (first > second) ? Math.ceil(first) : Math.floor(second);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
-const randomRange = (int1, int2) => {
-  let from = Math.min(int1, int2);
-  from = (from < 10) ? `0${from}` : from;
-  let to = Math.max(int1, int2);
-  to = (to < 10) ? `0${to}` : to;
-  return [`${from}`, `${to}`];
-};
-
-const randomRangeHours = () => {
-  const int1 = getRandomInt(0, 23);
-  const int2 = getRandomInt(0, 23);
-  return randomRange(int1, int2);
-};
-
-const randomRangeMinutes = () => {
-  const int1 = getRandomInt(1, 59);
-  const int2 = getRandomInt(1, 59);
-  return randomRange(int1, int2);
-};
-
 const calculateTimeDifference = (dateFrom, dateTo) => {
 
   const daysCount = dayjs(dateTo).diff(dayjs(dateFrom), 'day');
@@ -78,11 +52,11 @@ const sortByDay = (a, b) => {
 };
 
 const sortByTime = (a, b) => {
-  a = dayjs(a.dateTo).diff(a.dateFrom, 'hours');
-  b = dayjs(b.dateTo).diff(b.dateFrom, 'hours');
+  a = dayjs(a.dateTo).diff(a.dateFrom, 'minutes');
+  b = dayjs(b.dateTo).diff(b.dateFrom, 'minutes');
   return  b - a;
 };
 
 const sortByPrice = (a, b) => b.basePrice - a.basePrice;
 
-export { filter, getRandomInt, randomRangeHours, randomRangeMinutes, calculateTimeDifference, sortByDay, sortByTime, sortByPrice};
+export { filter, calculateTimeDifference, sortByDay, sortByTime, sortByPrice};

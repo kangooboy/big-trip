@@ -24,14 +24,14 @@ export default class PointPresenter {
     this.#changeMode = changeMode;
   }
 
-  init = (point, destinations) => {
+  init = (point, allDestinations, allOffers) => {
     this.#point = point;
 
     const prevPointComponent = this.#pointComponent;
     const prevEditPointComponent = this.#editPointComponent;
 
-    this.#pointComponent = new PointView(point);
-    this.#editPointComponent = new EditPointView(point, destinations);
+    this.#pointComponent = new PointView(point, allOffers);
+    this.#editPointComponent = new EditPointView(point, allDestinations, allOffers);
 
     this.#pointComponent.setEditClickHandler(this.#replacePointToEdit);
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);

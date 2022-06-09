@@ -61,7 +61,7 @@ export default class TripPresenter {
   createPoint = (callback) => {
     this.#currentSortType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#pointNewPresenter.init(callback);
+    this.#pointNewPresenter.init(callback, this.#pointsModel.allDestinations, this.#pointsModel.allOffers);
   };
 
   #renderTrip = () => {
@@ -98,9 +98,8 @@ export default class TripPresenter {
   };
 
   #renderPoint = (point) => {
-    // console.log(this.#pointsModel.destinations);
     const pointPresenter = new PointPresenter(this.#tripListComponent.element, this.#handleViewAction, this.#handleModeChange);
-    pointPresenter.init(point, this.#pointsModel.destinations);
+    pointPresenter.init(point, this.#pointsModel.allDestinations, this.#pointsModel.allOffers);
     this.#pointPresenter.set(point.id, pointPresenter);
   };
 

@@ -1,7 +1,18 @@
-// import PointView from '../view/point-view.js';
 import EditPointView from '../view/edit-point-view.js';
 import { render, remove, RenderPosition } from '../framework/render.js';
-import {UserAction, UpdateType} from '../const.js';
+import { UserAction, UpdateType } from '../const.js';
+import dayjs from 'dayjs';
+
+const generateBlankPoint = () => ({
+  basePrice: Number(),
+  dateFrom: dayjs(),
+  dateTo: dayjs(),
+  destination: '',
+  isFavorite: false,
+  offers: [],
+  type: 'taxi',
+  newPoint: true
+});
 
 export default class PointNewPresenter {
   #tripListContainer = null;
@@ -14,14 +25,14 @@ export default class PointNewPresenter {
     this.#changeData = changeData;
   }
 
-  init = (callback) => {
+  init = (callback, allDestinations, allOffers) => {
     this.#destroyCallback = callback;
 
     if (this.#editPointComponent !== null) {
       return;
     }
 
-    this.#editPointComponent = new EditPointView();
+    this.#editPointComponent = new EditPointView(generateBlankPoint(), allDestinations, allOffers);
 
     this.#editPointComponent.setEditFormSubmitHandler(this.#handleEditFormSubmit);
     this.#editPointComponent.setDeleteClickHandler(this.#handleDeleteClick);
