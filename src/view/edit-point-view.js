@@ -66,7 +66,7 @@ const createTypeOfPoint = (offers) => offers.reduce((prev, curr) => `${prev}
   </div>`, '');
 
 const createEditPointTemplate = (data, allDestinations, allOffers) => {
-  const { basePrice, destination, type, offers, dateFrom, dateTo, newPoint } = data;
+  const { basePrice, destination, type, offers, dateFrom, dateTo, newPoint, isDisabled, isSaving, isDeleting } = data;
   return (
     `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -90,7 +90,7 @@ const createEditPointTemplate = (data, allDestinations, allOffers) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" 
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text"
             name="event-destination" ${(destination) ? `value=${destination.name}` : 'placeholder="choose target city"'} list="destination-list-1" required>
             <datalist id="destination-list-1">
               ${createDestinationList(allDestinations)}
@@ -115,8 +115,19 @@ const createEditPointTemplate = (data, allDestinations, allOffers) => {
             <input class="event__input  event__input--price" id="event-price-1" type="text" 
             name="event-price" value="${basePrice}" pattern="^[1-9]+[0-9]*$" required>
           </div>
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">${(newPoint) ? 'Cancel' : 'Delete'}</button>
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+    ${(() => {
+      if(newPoint) {
+        return 'Cancel';
+      } if(isDeleting) {
+        return 'Deleting...';
+      } else {
+        return 'Delete';
+      }
+    })()}
+          </button>
+          
           ${(newPoint) ? '' : '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>'}
         </header>
         <section class="event__details">
