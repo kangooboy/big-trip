@@ -52,6 +52,13 @@ export default class PointNewPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
+  setSaving = () => {
+    this.#editPointComponent.updateElement({
+      isDisabled: true,
+      isSaving: true
+    });
+  };
+
   #handleDeleteClick = () => {
     this.destroy();
   };
@@ -69,7 +76,6 @@ export default class PointNewPresenter {
       UpdateType.MINOR,
       point
     );
-    this.destroy();
   };
 }
 
