@@ -67,6 +67,13 @@ const createTypeOfPoint = (offers) => offers.reduce((prev, curr) => `${prev}
 
 const createEditPointTemplate = (data, allDestinations, allOffers) => {
   const { basePrice, destination, type, offers, dateFrom, dateTo, newPoint, isDisabled, isSaving, isDeleting } = data;
+  let buttonText = 'Delete';
+  if(newPoint) {
+    buttonText = 'Cancel';
+  }
+  if(isDeleting) {
+    buttonText = 'Deleting...';
+  }
   return (
     `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -116,17 +123,7 @@ const createEditPointTemplate = (data, allDestinations, allOffers) => {
             name="event-price" value="${basePrice}" pattern="^[1-9]+[0-9]*$" required>
           </div>
           <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
-          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
-    ${(() => {
-      if(newPoint) {
-        return 'Cancel';
-      } if(isDeleting) {
-        return 'Deleting...';
-      } else {
-        return 'Delete';
-      }
-    })()}
-          </button>
+          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${buttonText}</button>
           
           ${(newPoint) ? '' : '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>'}
         </header>
