@@ -11,6 +11,7 @@ import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import { sortByDay, sortByTime, sortByPrice} from '../util.js';
 import { FilterType, SortType, UpdateType, UserAction } from '../const.js';
 import { filter } from '../util.js';
+import dayjs from 'dayjs';
 
 const TimeLimit = {
   LOWER_LIMIT: 350,
@@ -23,7 +24,7 @@ export default class TripPresenter {
   #tripHeaderContainer = null;
   #tripListComponent = new TripListView();
   #sortComponent = null;
-  #infoComponent = new TripInfoView();
+  #infoComponent = null;
   #loadingComponent = new LoadingView();
   #pointPresenter = new Map();
   #pointNewPresenter = null;
@@ -78,16 +79,22 @@ export default class TripPresenter {
     }
 
     if(this.points.length === 0) {
+      this.#renderTripInfo();
+      this.#renderTripList();
       this.#renderNoPointComponent();
     } else {
       this.#renderTripInfo();
       this.#renderSort();
-      render(this.#tripListComponent, this.#tripContainer);
+      this.#renderTripList();
 
       for(const point of this.points) {
         this.#renderPoint(point);
       }
     }
+  };
+
+  #renderTripList = () => {
+    render(this.#tripListComponent, this.#tripContainer);
   };
 
   #renderLoading = () => {
@@ -111,6 +118,51 @@ export default class TripPresenter {
   };
 
   #renderTripInfo = () => {
+    const points = [...this.points];
+    const allOffers = [...this.#pointsModel.allOffers];
+    let tripTitle = '';
+    let tripDate = '';
+
+    if(points.length > 0) {
+      points.sort(sortByDay);
+      const startPoint = points[0].destination.name;
+      const endPoint = points[points.length - 1].destination.name;
+      const dateFrom = dayjs(points[0].dateFrom).format('D MMMM');
+      const dateTo = dayjs(points[points.length - 1].dateTo).format('D MMMM');
+
+      if(points.length === 1) {
+        tripTitle = startPoint;
+        tripDate = dateFrom;
+      }
+      if(points.length === 2) {
+        tripTitle = `${startPoint} ${String.fromCharCode(0x2014)} ${endPoint}`;
+        tripDate = `${dateFrom} ${String.fromCharCode(0x2014)} ${dateTo}`;
+      }
+      if(points.length === 3) {
+        const secondPoint = points[1].destination.name;
+        tripTitle = `${startPoint} ${String.fromCharCode(0x2014)} ${secondPoint} ${String.fromCharCode(0x2014)} ${endPoint}`;
+        tripDate = `${dateFrom} ${String.fromCharCode(0x2014)} ${dateTo}`;
+      }
+      if(points.length > 3) {
+        tripTitle = `${startPoint} ${String.fromCharCode(0x2026)} ${endPoint}`;
+        tripDate = `${dateFrom} ${String.fromCharCode(0x2014)} ${dateTo}`;
+      }
+      if(dateFrom === dateTo) {
+        tripDate = dateFrom;
+      }
+    }
+
+    const allPrices = [];
+    for(const point of points) {
+      const offerIndex = allOffers.findIndex((item) => item.type === point.type);
+      const pointAllOffers = allOffers[offerIndex].offers;
+      const targetOffers = pointAllOffers.filter((item) => point.offers.some((el) => item.id === el));
+      targetOffers.forEach((item) => allPrices.push(item.price));
+    }
+    points.forEach((item) => allPrices.push(item.basePrice));
+    const tripCost = allPrices.reduce((prev, curr) => prev + curr, 0);
+
+    this.#infoComponent = new TripInfoView(tripTitle, tripDate, tripCost);
     render(this.#infoComponent, this.#tripHeaderContainer, RenderPosition.AFTERBEGIN);
   };
 
@@ -133,6 +185,7 @@ export default class TripPresenter {
     this.#pointNewPresenter.destroy();
     this.#pointPresenter.forEach((presenter) => presenter.destroy());
     this.#pointPresenter.clear();
+    remove(this.#infoComponent);
     remove(this.#sortComponent);
     remove(this.#loadingComponent);
     if (this.#noPointComponent) {
