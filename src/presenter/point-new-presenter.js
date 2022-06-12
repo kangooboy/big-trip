@@ -4,8 +4,8 @@ import { UserAction, UpdateType } from '../const.js';
 
 const generateBlankPoint = () => ({
   basePrice: Number(),
-  dateFrom: new Date,
-  dateTo: new Date,
+  dateFrom: new Date(),
+  dateTo: new Date(),
   destination: '',
   isFavorite: false,
   offers: [],
