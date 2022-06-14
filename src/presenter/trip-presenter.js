@@ -18,7 +18,7 @@ const TimeLimit = {
   UPPER_LIMIT: 1000,
 };
 
-const getTripInfo = (points, allOffers, fiterEverything) => {
+const getTripInfo = (points, allOffers) => {
   let tripTitle = '';
   let tripDate = '';
   let tripCost = '';
