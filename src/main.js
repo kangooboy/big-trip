@@ -33,5 +33,9 @@ tripPresenter.init();
 pointsModel.init()
   .finally(() => {
     render(newPointButtonComponent, tripHeaderContainer);
+    if(pointsModel.allOffers.length === 0 || pointsModel.allDestinations.length === 0) {
+      newPointButtonComponent.element.disabled = true;
+      return;
+    }
     newPointButtonComponent.setNewPointClickHandler(handleNewPointButtonClick);
   });

@@ -23,4 +23,7 @@ const UserAction = {
   DELETE_POINT: 'DELETE_POINT',
 };
 
-export { FilterType, SortType, UpdateType, UserAction };
+const DOTTED_LINE = String.fromCharCode(0x2026);
+const LONG_DASH = String.fromCharCode(0x2014);
+
+export { FilterType, SortType, UpdateType, UserAction, DOTTED_LINE, LONG_DASH };

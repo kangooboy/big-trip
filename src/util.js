@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { FilterType } from './const.js';
 
-const filter = {
+const filterPoint = {
   [FilterType.EVERYTHING]: (points) => points,
   [FilterType.FUTURE]: (points) => points.filter((point) => dayjs().isBefore(point.dateFrom, 'D')),
   [FilterType.PAST]: (points) => points.filter((point) => dayjs().isAfter(point.dateFrom, 'D'))
@@ -59,4 +59,4 @@ const sortByTime = (a, b) => {
 
 const sortByPrice = (a, b) => b.basePrice - a.basePrice;
 
-export { filter, calculateTimeDifference, sortByDay, sortByTime, sortByPrice};
+export { filterPoint, calculateTimeDifference, sortByDay, sortByTime, sortByPrice};

@@ -32,10 +32,8 @@ const createDestinationList = (names) => names.reduce((prev, curr) => `${prev}
 <option value="${curr.name}"></option>`, '');
 
 const createOfferButtonsTemplate = (type, offers, allOffers, newPoint) => {
-  const offerIndex = allOffers.findIndex((item) => item.type === type);
-  const targetOffers = allOffers[offerIndex].offers;
-
-  return targetOffers.reduce((prev, curr) => {
+  const targetPoint = allOffers.find((item) => item.type === type);
+  return targetPoint.offers.reduce((prev, curr) => {
     const { title, price, id } = curr;
     return `${prev}
       <div class="event__offer-selector">
@@ -51,13 +49,17 @@ const createOfferButtonsTemplate = (type, offers, allOffers, newPoint) => {
   }, '');
 };
 
-const createOfferContainer = (type, offers, allOffers, newPoint) => (offers !== []) ? (
-  `<section class="event__section  event__section--offers">
-    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-    <div class="event__available-offers">
-      ${(createOfferButtonsTemplate(type, offers, allOffers, newPoint))}
-    </div>
-  </section>`) : '';
+const createOfferContainer = (type, offers, allOffers, newPoint) => {
+  const targetPoint = allOffers.find((item) => item.type === type);
+  return (targetPoint.offers.length !== 0) ?
+    `<section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+      <div class="event__available-offers">
+        ${(createOfferButtonsTemplate(type, offers, allOffers, newPoint))}
+      </div>
+    </section>` : '';
+};
+
 
 const createTypeOfPoint = (offers) => offers.reduce((prev, curr) => `${prev}
   <div class="event__type-item">
@@ -188,9 +190,12 @@ export default class EditPointView extends AbstractStatefulView {
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
   };
 
-  #formDeleteClickHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.deleteClick(EditPointView.parseStateToPoint(this._state));
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setEditFormClickHandler(this._callback.editFormClick);
+    this.setEditFormSubmitHandler(this._callback.editFormSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+    this.#setDatepicker();
   };
 
   #editFormClick = (evt) => {
@@ -208,10 +213,9 @@ export default class EditPointView extends AbstractStatefulView {
       return;
     }
     const targetPoint = this.#allOffers.find((item) => item.type === evt.target.value);
-    const targetOffersId = targetPoint.offers.map((item) => item.id);
     this.updateElement({
       type: targetPoint.type,
-      offers: targetOffersId
+      offers: []
     });
   };
 
@@ -234,6 +238,12 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
+  #clearNotValidValue = (evt) => {
+    if(isNaN(Number(evt.target.value))) {
+      evt.target.value = '';
+    }
+  };
+
   #checkOffer = (evt) => {
     if(evt.target.tagName !== 'INPUT') {
       return;
@@ -249,42 +259,6 @@ export default class EditPointView extends AbstractStatefulView {
     this._setState({
       offers: offers
     });
-  };
-
-  static parsePointToState = (point) => Object.assign({
-    isDisabled: false,
-    isSaving: false,
-    isDeleting: false,},
-  point);
-
-  static parseStateToPoint = (state) => {
-    const point = JSON.parse(JSON.stringify(state));
-    point.basePrice = Number(point.basePrice);
-    delete point.isDisabled;
-    delete point.isSaving;
-    delete point.isDeleting;
-    if(point.newPoint) {
-      delete point.newPoint;
-    }
-    return point;
-  };
-
-  #setInnerHandlers = () => {
-    this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypePoint);
-    this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestination);
-    this.element.querySelector('.event__input--price').addEventListener('change', this.#changePrice);
-    if(this.element.querySelector('.event__section--offers') !== null) {
-      this.element.querySelector('.event__available-offers').addEventListener('click', this.#checkOffer);
-    }
-    this.#setDatepicker();
-  };
-
-  _restoreHandlers = () => {
-    this.#setInnerHandlers();
-    this.setEditFormClickHandler(this._callback.editFormClick);
-    this.setEditFormSubmitHandler(this._callback.editFormSubmit);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-    this.#setDatepicker();
   };
 
   #dateFromChangeHandler = ([dateFrom]) => {
@@ -325,5 +299,39 @@ export default class EditPointView extends AbstractStatefulView {
         onChange: this.#dateToChangeHandler,
       },
     );
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypePoint);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestination);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#changePrice);
+    this.element.querySelector('.event__input--price').addEventListener('blur', this.#clearNotValidValue);
+    if(this.element.querySelector('.event__section--offers') !== null) {
+      this.element.querySelector('.event__available-offers').addEventListener('click', this.#checkOffer);
+    }
+    this.#setDatepicker();
+  };
+
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteClick(EditPointView.parseStateToPoint(this._state));
+  };
+
+  static parsePointToState = (point) => Object.assign({
+    isDisabled: false,
+    isSaving: false,
+    isDeleting: false,},
+  point);
+
+  static parseStateToPoint = (state) => {
+    const point = JSON.parse(JSON.stringify(state));
+    point.basePrice = Number(point.basePrice);
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
+    if(point.newPoint) {
+      delete point.newPoint;
+    }
+    return point;
   };
 }
