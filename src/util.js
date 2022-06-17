@@ -59,4 +59,6 @@ const sortByTime = (a, b) => {
 
 const sortByPrice = (a, b) => b.basePrice - a.basePrice;
 
-export { filterPoint, calculateTimeDifference, sortByDay, sortByTime, sortByPrice};
+const validateInputPrice = (value) => !/^\+?[1-9]\d*$/.test(value);
+
+export { filterPoint, calculateTimeDifference, sortByDay, sortByTime, sortByPrice, validateInputPrice};

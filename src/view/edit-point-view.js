@@ -1,4 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import { validateInputPrice } from '../util.js';
 import dayjs from 'dayjs';
 
 import flatpickr from 'flatpickr';
@@ -230,16 +231,13 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #changePrice = (evt) => {
-    if(evt.target.tagName !== 'INPUT' || isNaN(Number(evt.target.value)) || Number(evt.target.value) <= 0) {
-      return;
-    }
     this._setState({
       basePrice: evt.target.value
     });
   };
 
   #clearNotValidValue = (evt) => {
-    if(isNaN(Number(evt.target.value))) {
+    if(validateInputPrice(evt.target.value)) {
       evt.target.value = '';
     }
   };
