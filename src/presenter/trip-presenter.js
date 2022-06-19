@@ -121,14 +121,14 @@ export default class TripPresenter {
   };
 
   #renderTrip = () => {
-    if (this.#isLoading || this.#pointsModel.allOffers.length === 0 || this.#pointsModel.allDestinations.length === 0) {
+    if (this.#isLoading) {
       this.#renderLoading();
       return;
     }
 
     if(this.points.length === 0) {
       this.#renderTripList();
-      this.#renderNoPointComponent();
+      this.#renderNoPoint();
     } else {
       this.#renderTripInfo();
       this.#renderSort();
@@ -148,8 +148,12 @@ export default class TripPresenter {
     render(this.#loadingComponent, this.#tripContainer, RenderPosition.AFTERBEGIN);
   };
 
-  #renderNoPointComponent = () => {
-    this.#noPointComponent = new NoPointView(this.#filterType);
+  #renderNoPoint = () => {
+    if(this.#pointsModel.allDestinations.length === 0 || this.#pointsModel.allOffers.length === 0) {
+      this.#noPointComponent = new NoPointView();
+    }else {
+      this.#noPointComponent = new NoPointView(this.#filterType);
+    }
     render(this.#noPointComponent, this.#tripContainer);
   };
 
